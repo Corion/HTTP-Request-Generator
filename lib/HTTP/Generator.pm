@@ -37,8 +37,10 @@ sub fetch_all( $iterator ) {
     url          => ['/'],
     port         => [80],
     protocol     => ['http'],
+
     # How can we specify various values for the headers?
     headers      => [{}],
+
     #get_params   => [],
     #post_params  => [],
     #url_params   => [],
@@ -56,6 +58,13 @@ sub fill_url( $url, $values ) {
     };
     $url
 };
+
+# Convert nonref arguments to arrayrefs
+sub _makeref {
+    map {
+        ref $_ ne 'ARRAY' ? [$_] : $_
+    } @_
+}
 
 sub _generate_requests_iter(%options) {
     my $wrapper = delete $options{ wrap } || sub {@_};
@@ -76,16 +85,16 @@ sub _generate_requests_iter(%options) {
     $args{ $_ } ||= {}
         for qw(get_params post_params url_params);
     
-    my @loops = map { ref $_ ne 'ARRAY' ? [$_] : $_ } @args{ @keys };
+    my @loops = _makeref @args{ @keys };
     
     # Turn all get_params into additional loops for each entry in keys %$get_params
     # Turn all post_params into additional loops over keys %$post_params
     my @get_params = keys %$get_params;
-    push @loops, values %$get_params;
+    push @loops, _makeref values %$get_params;
     my @post_params = keys %$post_params;
-    push @loops, values %$post_params;
+    push @loops, _makeref values %$post_params;
     my @url_params = keys %$url_params;
-    push @loops, values %$url_params;
+    push @loops, _makeref values %$url_params;
     
     #warn "Looping over " . Dumper \@loops;
     
