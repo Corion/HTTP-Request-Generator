@@ -69,7 +69,7 @@ sub _makeref {
 sub _generate_requests_iter(%options) {
     my $wrapper = delete $options{ wrap } || sub {@_};
     my @keys = sort keys %defaults;
-    
+
     my $get_params = $options{ get_params } || {};
     my $post_params = $options{ post_params } || {};
     my $url_params = $options{ url_params } || {};
@@ -84,9 +84,9 @@ sub _generate_requests_iter(%options) {
     @keys = sort keys %args; # somewhat predictable
     $args{ $_ } ||= {}
         for qw(get_params post_params url_params);
-    
+
     my @loops = _makeref @args{ @keys };
-    
+
     # Turn all get_params into additional loops for each entry in keys %$get_params
     # Turn all post_params into additional loops over keys %$post_params
     my @get_params = keys %$get_params;
@@ -95,14 +95,14 @@ sub _generate_requests_iter(%options) {
     push @loops, _makeref values %$post_params;
     my @url_params = keys %$url_params;
     push @loops, _makeref values %$url_params;
-    
+
     #warn "Looping over " . Dumper \@loops;
-    
+
     my $iter = NestedLoops(\@loops,{});
-    
+
     # Set up the fixed parts
     my %template;
-    
+
     for(qw(get_params post_params headers)) {
         $template{ $_ } = $options{ "fixed_$_" } || {};
     };
@@ -117,7 +117,7 @@ sub _generate_requests_iter(%options) {
         my %values = %template;
         my @vv = splice @v, 0, 0+@keys;
         @values{ @keys } = @vv;
-        
+
         # Now add the get_params, if any
         if(@get_params) {
             my @get_values = splice @v, 0, 0+@get_params;
@@ -135,11 +135,11 @@ sub _generate_requests_iter(%options) {
             @v{ @url_params } = splice @v, 0, 0+@url_params;
             $values{ url } = fill_url($values{ url }, \%v);
         };
-        
+
         # Merge the headers as well
         #warn "Merging headers: " . Dumper($values{headers}). " + " . (Dumper $template{headers});
         %{$values{headers}} = (%{$template{headers}}, %{$values{headers} || {}});
-        
+
         return $wrapper->(\%values);
     };
 }
@@ -154,8 +154,40 @@ sub generate_requests(%options) {
 }
 
 sub as_dancer($req) {
+    require Dancer::Request;
+    # Also, HTTP::Message 6+ for ->flatten()
+
+    my $body = '';
+    my $headers;
+    my $form_ct;
+    if( keys %{$req->{post_params}}) {
+        require HTTP::Request::Common;
+        my $r = HTTP::Request::Common::POST( $req->{url},
+            [ %{ $req->{post_params} }],
+        );
+        $headers = HTTP::Headers->new( %{ $req->{headers} }, $r->headers->flatten );
+        $body = $r->content;
+        $form_ct = $r->content_type;
+    } else {
+        $headers = HTTP::Headers->new( %$headers );
+    };
+
     # Store metadata / generate "signature" for later inspection/isolation?
-    warn Dumper $req
+    local %ENV; # wipe out non-overridable default variables of Dancer::Request
+    my $res = Dancer::Request->new_for_request(
+        $req->{method},
+        $req->{url},
+        $req->{get_params},
+        $body,
+        $headers,
+        { CONTENT_LENGTH => length($body),
+          CONTENT_TYPE => $form_ct },
+    );
+    use Data::Dumper;
+    warn Dumper $res->{_http_body};
+    $res->{_http_body}->add($body);
+    warn Dumper $res->{_http_body};
+    $res
 }
 
 1;

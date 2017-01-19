@@ -14,7 +14,6 @@ is 0+@requests, 1;
 );
 is 0+@requests, 2, 'We get two data instances for "url" parameter';
 
-
 @requests = generate_requests(
     method => ['POST','GET'],
     url    => ['/','/index.html'],
