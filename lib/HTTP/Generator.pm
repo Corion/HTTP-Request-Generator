@@ -12,6 +12,38 @@ use Exporter 'import';
 
 HTTP::Generator - generate HTTP requests
 
+=head1 SYNOPSIS
+
+
+    @requests = generate_requests(
+        method => 'POST',
+        url    => '/profiles/:name',
+        url_params => {
+            name => ['Corion','Co-Rion'],
+        },
+        get_params => {
+            stars => [2,3],
+        },
+        post_params => {
+            comment => ['Some comment', 'Another comment, A++'],
+        },
+        headers => [
+            {
+                "Content-Type" => 'text/plain; encoding=UTF-8',
+                Cookie => 'my_session_id',
+            },
+            {
+                "Content-Type" => 'text/plain; encoding=Latin-1',
+                Cookie => 'my_session_id',
+            },
+        ],
+    );
+    # Generates 16 requests out of the combinations
+
+    for my $req (@requests) {
+        $ua->request( $req );
+    };
+
 =cut
 
 use vars qw($VERSION %defaults @EXPORT_OK);
@@ -144,6 +176,42 @@ sub _generate_requests_iter(%options) {
     };
 }
 
+=head2 generate_requests( %options )
+
+  generate_requests(
+      url => '/profiles/:name',
+      url_params => ['Mark','John'],
+      wrap => sub {
+          my( $req ) = @_;
+          # Fix up some values
+          $req->{headers}->{'Content-Length'} = 666;
+      },
+  );
+
+This function creates data structures that are suitable for sending off
+a mass of similar but different HTTP requests. All array references are expanded
+into the cartesian product of their contents. The above example would create
+two requests:
+
+      url => '/profiles/Mark,
+      url => '/profiles/John',
+
+There are helper functions
+that will turn that data into a data structure suitable for your HTTP framework
+of choice.
+
+  {
+    method => 'GET',
+    url => '/profiles/Mark',
+    protocol => 'http',
+    port => 80,
+    headers => {},
+    post_params => {},
+    get_params => {},
+  }
+
+=cut
+
 sub generate_requests(%options) {
     my $i = _generate_requests_iter(%options);
     if( wantarray ) {
@@ -191,3 +259,7 @@ sub as_dancer($req) {
 }
 
 1;
+
+=head1 SEE ALSO
+
+=cut
