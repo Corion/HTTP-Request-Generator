@@ -35,7 +35,7 @@ HTTP::Generator - generate HTTP requests
 
 ## generate\_requests( %options )
 
-    generate_requests(
+    my $g = generate_requests(
         url => '/profiles/:name',
         url_params => ['Mark','John'],
         wrap => sub {
@@ -44,6 +44,9 @@ HTTP::Generator - generate HTTP requests
             $req->{headers}->{'Content-Length'} = 666;
         },
     );
+    while( my $r = $g->()) {
+        send_request( $r );
+    };
 
 This function creates data structures that are suitable for sending off
 a mass of similar but different HTTP requests. All array references are expanded

@@ -182,7 +182,7 @@ sub _generate_requests_iter(%options) {
 
 =head2 generate_requests( %options )
 
-  generate_requests(
+  my $g = generate_requests(
       url => '/profiles/:name',
       url_params => ['Mark','John'],
       wrap => sub {
@@ -191,6 +191,9 @@ sub _generate_requests_iter(%options) {
           $req->{headers}->{'Content-Length'} = 666;
       },
   );
+  while( my $r = $g->()) {
+      send_request( $r );
+  };
 
 This function creates data structures that are suitable for sending off
 a mass of similar but different HTTP requests. All array references are expanded
