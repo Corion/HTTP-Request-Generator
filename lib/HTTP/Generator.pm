@@ -14,7 +14,6 @@ HTTP::Generator - generate HTTP requests
 
 =head1 SYNOPSIS
 
-
     @requests = generate_requests(
         method => 'POST',
         url    => '/profiles/:name',
@@ -120,7 +119,6 @@ sub _generate_requests_iter(%options) {
     @keys = sort keys %args; # somewhat predictable
     $args{ $_ } ||= {}
         for qw(get_params post_params url_params);
-
     my @loops = _makeref @args{ @keys };
 
     # Turn all get_params into additional loops for each entry in keys %$get_params
@@ -258,10 +256,29 @@ sub as_dancer($req) {
         { CONTENT_LENGTH => length($body),
           CONTENT_TYPE => $form_ct },
     );
-    use Data::Dumper;
-    warn Dumper $res->{_http_body};
     $res->{_http_body}->add($body);
-    warn Dumper $res->{_http_body};
+    $res
+}
+
+sub as_plack($req) {
+    require Plack::Request;
+
+    my %env = %$req;
+    $env{ 'psgi.version' } = '1.0';
+    $env{ 'psgi.url_scheme' } = delete $env{ protocol };
+    $env{ 'plack.request.query_parameters' } = delete $env{ get_params };
+    $env{ 'plack.request.body_parameters' } = delete $env{ post_params };
+    $env{ 'plack.request.headers' } = HTTP::Headers->new( %{ $req->{headers} });
+    $env{ REQUEST_METHOD } = delete $env{ method };
+    $env{ SCRIPT_NAME } = delete $env{ url };
+    $env{ QUERY_STRING } = ''; # not correct, but...
+    $env{ SERVER_NAME } = delete $env{ host };
+    $env{ SERVER_PORT } = delete $env{ port };
+    # XXX need to convert the headers into %env HTTP_ keys here
+
+    # Store metadata / generate "signature" for later inspection/isolation?
+    local %ENV; # wipe out non-overridable default variables of Dancer::Request
+    my $res = Plack::Request->new(\%env);
     $res
 }
 
