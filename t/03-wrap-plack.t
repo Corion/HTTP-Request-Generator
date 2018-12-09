@@ -2,11 +2,22 @@
 use strict;
 use HTTP::Generator qw(generate_requests);
 use Data::Dumper;
+use Test::More;
 
 # Skip if unavailable
-use Plack::Request;
+my $ok = eval {
+    require Plack::Request;
+    require HTTP::Headers;
+    require Hash::MultiValue;
+    1;
+};
+my $err = $@;
+if( !$ok) {
+    plan skip_all => "Couldn't load test prerequiste modules: $err";
+    exit;
+};
 
-use Test::More tests => 3;
+plan tests => 3;
 
 my @requests = generate_requests(
     method => 'POST',
