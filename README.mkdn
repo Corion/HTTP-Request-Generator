@@ -26,7 +26,7 @@ HTTP::Generator - generate HTTP requests
         get_params => {
             stars => [2,3],
         },
-        post_params => {
+        body_params => {
             comment => ['Some comment', 'Another comment, A++'],
         },
         headers => [
@@ -46,7 +46,7 @@ HTTP::Generator - generate HTTP requests
         $ua->request( $req );
     };
 
-## generate\_requests( %options )
+## `generate_requests( %options )`
 
     my $g = generate_requests(
         url => '/profiles/:name',
@@ -82,7 +82,7 @@ of choice.
       protocol => 'http',
       port => 80,
       headers => {},
-      post_params => {},
+      body_params => {},
       get_params => {},
     }
 
@@ -106,7 +106,7 @@ lists will be expanded in memory.
 
     Parameters to replace in the `url` template.
 
-- **post\_params**
+- **body\_params**
 
     Parameters to replace in the POST body.
 
@@ -124,11 +124,20 @@ lists will be expanded in memory.
 
 - **headers**
 
-    Headers to use. Currently, no templates are generated for the headers.
+    Headers to use. Currently, no templates are generated for the headers. You have
+    to specify complete sets of headers for each alternative.
 
 - **limit**
 
-    Limit the number of requests generated
+    Limit the number of requests generated.
+
+## `as_dancer`
+
+Converts the request data to a [Dancer::Request](https://metacpan.org/pod/Dancer::Request) object.
+
+## `as_plack`
+
+Converts the request data to a [Plack::Request](https://metacpan.org/pod/Plack::Request) object.
 
 # SEE ALSO
 
@@ -138,6 +147,6 @@ lists will be expanded in memory.
 
 Hey! **The above document had some coding errors, which are explained below:**
 
-- Around line 379:
+- Around line 392:
 
     alternative text 'https://curl.haxx.se/docs/manpage.html' contains non-escaped | or /
