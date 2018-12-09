@@ -141,12 +141,4 @@ Converts the request data to a [Plack::Request](https://metacpan.org/pod/Plack::
 
 # SEE ALSO
 
-[https://curl.haxx.se/docs/manpage.html](https://metacpan.org/pod/The&#x20;Curl&#x20;Manpage) for the pattern syntax
-
-# POD ERRORS
-
-Hey! **The above document had some coding errors, which are explained below:**
-
-- Around line 392:
-
-    alternative text 'https://curl.haxx.se/docs/manpage.html' contains non-escaped | or /
+[The Curl Manpage](https://curl.haxx.se/docs/manpage.html) for the pattern syntax

@@ -28,7 +28,7 @@ Should you wish to install this module manually, the procedure is
 
 SEE ALSO
 
-L<https://curl.haxx.se/docs/manpage.html|The Curl Manpage> for the pattern syntax
+L<The Curl Manpage|https://curl.haxx.se/docs/manpage.html> for the pattern syntax
 
 
 

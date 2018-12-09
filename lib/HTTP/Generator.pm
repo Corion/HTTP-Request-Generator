@@ -389,6 +389,6 @@ sub as_plack($req) {
 
 =head1 SEE ALSO
 
-L<https://curl.haxx.se/docs/manpage.html|The Curl Manpage> for the pattern syntax
+L<The Curl Manpage|https://curl.haxx.se/docs/manpage.html> for the pattern syntax
 
 =cut
