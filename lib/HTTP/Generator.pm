@@ -233,6 +233,9 @@ two requests:
       url => '/profiles/Mark,
       url => '/profiles/John',
 
+C<generate_requests> returns an iterator in scalar context. In list context, it
+returns the complete list of requests.
+
 There are helper functions
 that will turn that data into a data structure suitable for your HTTP framework
 of choice.
@@ -246,6 +249,50 @@ of choice.
     post_params => {},
     get_params => {},
   }
+
+As a shorthand for creating lists, you can use the C<pattern> option, which
+will expand a string into a set of requests. C<{}> will expand into alternatives
+while C<[xx..yy]> will expand into the range C<xx> to C<yy>. Note that these
+lists will be expanded in memory.
+
+=head3 Options
+
+=over 4
+
+=item B<pattern>
+
+Generate URLs from this pattern instead of C<get_params>, C<url_params>
+and C<url>.
+
+=item B<url>
+
+URL template to use.
+
+=item B<url_params>
+
+Parameters to replace in the C<url> template.
+
+=item B<post_params>
+
+Parameters to replace in the POST body.
+
+=item B<get_params>
+
+Parameters to replace in the GET request.
+
+=item B<host>
+
+Hostname(s) to use.
+
+=item B<port>
+
+Port(s) to use.
+
+=item B<headers>
+
+Headers to use. Currently, no templates are generated for the headers.
+
+=back
 
 =cut
 
@@ -320,5 +367,7 @@ sub as_plack($req) {
 1;
 
 =head1 SEE ALSO
+
+L<https://curl.haxx.se/docs/manpage.html|The Curl Manpage> for the pattern syntax
 
 =cut

@@ -9,6 +9,15 @@ HTTP::Generator - generate HTTP requests
 # SYNOPSIS
 
     @requests = generate_requests(
+        method  => 'GET',
+        pattern => 'https://example.com/{bar,foo,gallery}/[00..99].html',
+    );
+
+    # generates 300 requests from
+    #     https://example.com/bar/00.html to
+    #     https://example.com/gallery/99.html
+
+    @requests = generate_requests(
         method => 'POST',
         url    => '/profiles/:name',
         url_params => {
@@ -60,6 +69,9 @@ two requests:
       url => '/profiles/Mark,
       url => '/profiles/John',
 
+`generate_requests` returns an iterator in scalar context. In list context, it
+returns the complete list of requests.
+
 There are helper functions
 that will turn that data into a data structure suitable for your HTTP framework
 of choice.
@@ -74,4 +86,58 @@ of choice.
       get_params => {},
     }
 
+As a shorthand for creating lists, you can use the `pattern` option, which
+will expand a string into a set of requests. `{}` will expand into alternatives
+while `[xx..yy]` will expand into the range `xx` to `yy`. Note that these
+lists will be expanded in memory.
+
+### Options
+
+- **pattern**
+
+    Generate URLs from this pattern instead of `get_params`, `url_params`
+    and `url`.
+
+- **url**
+
+    URL template to use.
+
+- **url\_params**
+
+    Parameters to replace in the `url` template.
+
+- **post\_params**
+
+    Parameters to replace in the POST body.
+
+- **get\_params**
+
+    Parameters to replace in the GET request.
+
+- **host**
+
+    Hostname(s) to use.
+
+- **port**
+
+    Port(s) to use.
+
+- **headers**
+
+    Headers to use. Currently, no templates are generated for the headers.
+
+- **limit**
+
+    Limit the number of requests generated
+
 # SEE ALSO
+
+[https://curl.haxx.se/docs/manpage.html](https://metacpan.org/pod/The&#x20;Curl&#x20;Manpage) for the pattern syntax
+
+# POD ERRORS
+
+Hey! **The above document had some coding errors, which are explained below:**
+
+- Around line 379:
+
+    alternative text 'https://curl.haxx.se/docs/manpage.html' contains non-escaped | or /
