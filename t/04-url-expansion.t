@@ -1,27 +1,27 @@
 #!perl -w
 use strict;
-use Test::More tests => 7;
+use Test::More tests => 8;
+use Data::Dumper;
 
-use lib '../HTTP-Generator/lib';
 use HTTP::Generator 'generate_requests';
 
 sub expand_url {
     my( $pattern ) = @_;
-    
+
     # generate all the parts
     my @requests = generate_requests(
         pattern => $pattern,
     );
-    
+
     my @urls = map { $_->{url} } @requests;
-    
-    @urls    
+
+    @urls
 }
 
 sub expands_properly {
     my( $pattern, $expected, $name) = @_;
     $name ||= "$pattern expands properly";
-    
+
     is_deeply [sort {$a cmp $b} expand_url($pattern)], [sort @$expected], $name;
 }
 
@@ -60,3 +60,10 @@ expands_properly('https://example.com/[a..b]/{index,error}.html', [
                  'https://example.com/b/index.html',
                  'https://example.com/b/error.html',
                  ], '[] and {} can be mixed');
+
+my @urls = generate_requests(
+    pattern => '[aa..zz][aa..zz][00..zz][00..zz]',
+    limit   => 10,
+);
+is 0+@urls, 10, "We can limit the number of created items"
+    or diag Dumper \@urls;

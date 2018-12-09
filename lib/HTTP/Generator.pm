@@ -63,10 +63,14 @@ sub unwrap($item,$default) {
     : $default
 }
 
-sub fetch_all( $iterator ) {
+sub fetch_all( $iterator, $limit=0 ) {
     my @res;
     while( my @r = $iterator->()) {
-        push @res, @r
+        push @res, @r;
+        if( $limit && (@res > $limit )) {
+            splice @res, $limit;
+            last
+        };
     };
     return @res
 };
@@ -290,7 +294,12 @@ Port(s) to use.
 
 =item B<headers>
 
-Headers to use. Currently, no templates are generated for the headers.
+Headers to use. Currently, no templates are generated for the headers. You have
+to specify complete sets of headers for each alternative.
+
+=item B<limit>
+
+Limit the number of requests generated.
 
 =back
 
@@ -299,7 +308,7 @@ Headers to use. Currently, no templates are generated for the headers.
 sub generate_requests(%options) {
     my $i = _generate_requests_iter(%options);
     if( wantarray ) {
-        return fetch_all($i);
+        return fetch_all($i, $options{ limit });
     } else {
         return $i
     }
