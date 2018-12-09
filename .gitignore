@@ -4,8 +4,8 @@ Makefile.old
 *.bak
 pm_to_blib
 blib/
-Filter-signatures-*
-Filter-signatures-*/
+HTTP-Generator-*
+HTTP-Generator-*/
 .releaserc
 cover_db
 firefox-versions/
