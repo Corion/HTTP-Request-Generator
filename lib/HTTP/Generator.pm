@@ -55,7 +55,7 @@ HTTP::Generator - generate HTTP requests
 =cut
 
 our $VERSION = '0.01';
-our @EXPORT_OK = qw( generate_requests );
+our @EXPORT_OK = qw( generate_requests as_dancer as_plack);
 
 sub unwrap($item,$default) {
     defined $item
@@ -214,7 +214,7 @@ sub _generate_requests_iter(%options) {
     };
 }
 
-=head2 generate_requests( %options )
+=head2 C<< generate_requests( %options ) >>
 
   my $g = generate_requests(
       url => '/profiles/:name',
@@ -314,6 +314,12 @@ sub generate_requests(%options) {
     }
 }
 
+=head2 C<< as_dancer >>
+
+Converts the request data to a L<Dancer::Request> object.
+
+=cut
+
 sub as_dancer($req) {
     require Dancer::Request;
     # Also, HTTP::Message 6+ for ->flatten()
@@ -347,6 +353,12 @@ sub as_dancer($req) {
     $res->{_http_body}->add($body);
     $res
 }
+
+=head2 C<< as_plack >>
+
+Converts the request data to a L<Plack::Request> object.
+
+=cut
 
 sub as_plack($req) {
     require Plack::Request;
