@@ -5,8 +5,8 @@ use Data::Dumper;
 use Test::More;
 
 my $ok = eval {
-    require Plack::Request;
     require HTTP::Headers;
+    require Plack::Request;
     require Hash::MultiValue;
     1;
 };
