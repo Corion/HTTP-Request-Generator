@@ -100,9 +100,33 @@ sub _makeref {
     } @_
 }
 
+# Convert a curl-style https://{www.,}example.com/foo-[00..99].html to
+#                      https://:1example.com/foo-:2.html
+sub expand_pattern( $pattern ) {
+    my %ranges;
+
+    my $idx = 0;
+
+    # Explicitly enumerate all ranges
+    $pattern =~ s!\[([^.]+)\.\.([^.]+)\]!$ranges{$idx} = [$1..$2]; ":".$idx++!ge;
+
+    # Move all explicitly enumerated parts into lists:
+    $pattern =~ s!\{([^\}]*)\}!$ranges{$idx} = [split /,/, $1, -1]; ":".$idx++!ge;
+
+    return (
+        url        => $pattern,
+        url_params => \%ranges,
+        raw_params => 1,
+    );
+}
+
 sub _generate_requests_iter(%options) {
     my $wrapper = delete $options{ wrap } || sub {@_};
     my @keys = sort keys %defaults;
+
+    if( my $pattern = delete $options{ pattern }) {
+        %options = (%options, expand_pattern( $pattern ));
+    };
 
     my $get_params = $options{ get_params } || {};
     my $post_params = $options{ post_params } || {};
