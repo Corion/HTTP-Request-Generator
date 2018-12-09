@@ -15,6 +15,15 @@ HTTP::Generator - generate HTTP requests
 =head1 SYNOPSIS
 
     @requests = generate_requests(
+        method  => 'GET',
+        pattern => 'https://example.com/{bar,foo,gallery}/[00..99].html',
+    );
+
+    # generates 300 requests from
+    #     https://example.com/bar/00.html to
+    #     https://example.com/gallery/99.html
+
+    @requests = generate_requests(
         method => 'POST',
         url    => '/profiles/:name',
         url_params => {
