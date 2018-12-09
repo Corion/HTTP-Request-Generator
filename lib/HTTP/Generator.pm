@@ -45,9 +45,8 @@ HTTP::Generator - generate HTTP requests
 
 =cut
 
-use vars qw($VERSION %defaults @EXPORT_OK);
-$VERSION = '0.01';
-@EXPORT_OK = qw( generate_requests );
+our $VERSION = '0.01';
+our @EXPORT_OK = qw( generate_requests );
 
 sub unwrap($item,$default) {
     defined $item
@@ -63,7 +62,7 @@ sub fetch_all( $iterator ) {
     return @res
 };
 
-%defaults = (
+our %defaults = (
     method       => ['GET'],
     url          => ['/'],
     port         => [80],
