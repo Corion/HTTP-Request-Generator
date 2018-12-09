@@ -1,73 +1,32 @@
-NAME
+HTTP::Generator - generate HTTP requests
 
-    HTTP::Generator - generate HTTP requests
 
-SYNOPSIS
 
-        @requests = generate_requests(
-            method => 'POST',
-            url    => '/profiles/:name',
-            url_params => {
-                name => ['Corion','Co-Rion'],
-            },
-            get_params => {
-                stars => [2,3],
-            },
-            post_params => {
-                comment => ['Some comment', 'Another comment, A++'],
-            },
-            headers => [
-                {
-                    "Content-Type" => 'text/plain; encoding=UTF-8',
-                    Cookie => 'my_session_id',
-                },
-                {
-                    "Content-Type" => 'text/plain; encoding=Latin-1',
-                    Cookie => 'my_session_id',
-                },
-            ],
-        );
-        # Generates 16 requests out of the combinations
-    
-        for my $req (@requests) {
-            $ua->request( $req );
-        };
+INSTALLATION
 
- generate_requests( %options )
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
 
-      my $g = generate_requests(
-          url => '/profiles/:name',
-          url_params => ['Mark','John'],
-          wrap => sub {
-              my( $req ) = @_;
-              # Fix up some values
-              $req->{headers}->{'Content-Length'} = 666;
-          },
-      );
-      while( my $r = $g->()) {
-          send_request( $r );
-      };
+  cpanm .
+  cpan  .
+  cpanp -i .
 
-    This function creates data structures that are suitable for sending off
-    a mass of similar but different HTTP requests. All array references are
-    expanded into the cartesian product of their contents. The above
-    example would create two requests:
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
 
-          url => '/profiles/Mark,
-          url => '/profiles/John',
+  perl Makefile.PL
+  make
+  make test
+  make install
 
-    There are helper functions that will turn that data into a data
-    structure suitable for your HTTP framework of choice.
 
-      {
-        method => 'GET',
-        url => '/profiles/Mark',
-        protocol => 'http',
-        port => 80,
-        headers => {},
-        post_params => {},
-        get_params => {},
-      }
+
+
+
+
+
 
 SEE ALSO
+
+
 

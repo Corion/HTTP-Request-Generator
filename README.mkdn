@@ -1,3 +1,7 @@
+
+[![Travis Build Status](https://travis-ci.org/Corion/HTTP-Generator.svg?branch=master)](https://travis-ci.org/Corion/HTTP-Generator)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/HTTP-Generator?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/HTTP-Generator)
+
 # NAME
 
 HTTP::Generator - generate HTTP requests
