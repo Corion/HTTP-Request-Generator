@@ -299,7 +299,7 @@ sub as_plack($req) {
     $env{ QUERY_STRING } = ''; # not correct, but...
     $env{ SERVER_NAME } = delete $env{ host };
     $env{ SERVER_PORT } = delete $env{ port };
-    # XXX need to convert the headers into %env HTTP_ keys here
+    # need to convert the headers into %env HTTP_ keys here
     $env{ CONTENT_TYPE } = undef;
 
     # Store metadata / generate "signature" for later inspection/isolation?
