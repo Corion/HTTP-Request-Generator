@@ -98,7 +98,7 @@ for my $test_file (@tests) {
     # Rerun the test without these modules and see whether it crashes
     my @failed;
     for my $candidate (@missing) {
-        diag "Checking that $candidate is not essential";
+        diag "Checking that $candidate is not essential for $test_file";
         my @cmd = ($^X, "-MTest::Without::Module=$candidate", "-Mblib", '-w', $test_file);
         my $cmd = join " ", @cmd;
 
