@@ -62,7 +62,7 @@ expands_properly('https://example.com/[a..b]/{index,error}.html', [
                  ], '[] and {} can be mixed');
 
 my @urls = generate_requests(
-    pattern => '[aa..zz][aa..zz][00..zz][00..zz]',
+    pattern => '[0..11][0..11]',
     limit   => 10,
 );
 is 0+@urls, 10, "We can limit the number of created items"
