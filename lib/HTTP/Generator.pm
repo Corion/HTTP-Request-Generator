@@ -285,12 +285,14 @@ sub as_dancer($req) {
 
 sub as_plack($req) {
     require Plack::Request;
+    require HTTP::Headers;
+    require Hash::MultiValue;
 
     my %env = %$req;
     $env{ 'psgi.version' } = '1.0';
     $env{ 'psgi.url_scheme' } = delete $env{ protocol };
     $env{ 'plack.request.query_parameters' } = delete $env{ get_params };
-    $env{ 'plack.request.body_parameters' } = delete $env{ post_params };
+    $env{ 'plack.request.body_parameters' } = [%{delete $env{ post_params }||{}} ];
     $env{ 'plack.request.headers' } = HTTP::Headers->new( %{ $req->{headers} });
     $env{ REQUEST_METHOD } = delete $env{ method };
     $env{ SCRIPT_NAME } = delete $env{ url };
@@ -298,6 +300,7 @@ sub as_plack($req) {
     $env{ SERVER_NAME } = delete $env{ host };
     $env{ SERVER_PORT } = delete $env{ port };
     # XXX need to convert the headers into %env HTTP_ keys here
+    $env{ CONTENT_TYPE } = undef;
 
     # Store metadata / generate "signature" for later inspection/isolation?
     local %ENV; # wipe out non-overridable default variables of Dancer::Request
