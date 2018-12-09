@@ -32,7 +32,7 @@ HTTP::Generator - generate HTTP requests
         get_params => {
             stars => [2,3],
         },
-        post_params => {
+        body_params => {
             comment => ['Some comment', 'Another comment, A++'],
         },
         headers => [
@@ -85,7 +85,7 @@ our %defaults = (
     headers      => [{}],
 
     #get_params   => [],
-    #post_params  => [],
+    #body_params  => [],
     #url_params   => [],
     #values       => [[]], # the list over which to iterate for *_params
 );
@@ -142,7 +142,7 @@ sub _generate_requests_iter(%options) {
     };
 
     my $get_params = $options{ get_params } || {};
-    my $post_params = $options{ post_params } || {};
+    my $body_params = $options{ body_params } || {};
     my $url_params = $options{ url_params } || {};
 
     $options{ "fixed_$_" } ||= {}
@@ -154,15 +154,15 @@ sub _generate_requests_iter(%options) {
                @keys;
     @keys = sort keys %args; # somewhat predictable
     $args{ $_ } ||= {}
-        for qw(get_params post_params url_params);
+        for qw(get_params body_params url_params);
     my @loops = _makeref @args{ @keys };
 
     # Turn all get_params into additional loops for each entry in keys %$get_params
-    # Turn all post_params into additional loops over keys %$post_params
+    # Turn all body_params into additional loops over keys %$body_params
     my @get_params = keys %$get_params;
     push @loops, _makeref values %$get_params;
-    my @post_params = keys %$post_params;
-    push @loops, _makeref values %$post_params;
+    my @body_params = keys %$body_params;
+    push @loops, _makeref values %$body_params;
     my @url_params = keys %$url_params;
     push @loops, _makeref values %$url_params;
 
@@ -173,7 +173,7 @@ sub _generate_requests_iter(%options) {
     # Set up the fixed parts
     my %template;
 
-    for(qw(get_params post_params headers)) {
+    for(qw(get_params body_params headers)) {
         $template{ $_ } = $options{ "fixed_$_" } || {};
     };
     #warn "Template setup: " . Dumper \%template;
@@ -193,10 +193,10 @@ sub _generate_requests_iter(%options) {
             my @get_values = splice @v, 0, 0+@get_params;
             $values{ get_params } = { (%{ $values{ get_params } }, zip( @get_params, @get_values )) };
         };
-        # Now add the post_params, if any
-        if(@post_params) {
-            my @values = splice @v, 0, 0+@post_params;
-            $values{ post_params } = { %{ $values{ post_params } }, zip @post_params, @values };
+        # Now add the body_params, if any
+        if(@body_params) {
+            my @values = splice @v, 0, 0+@body_params;
+            $values{ body_params } = { %{ $values{ body_params } }, zip @body_params, @values };
         };
 
         # Recreate the URL with the substituted values
@@ -250,7 +250,7 @@ of choice.
     protocol => 'http',
     port => 80,
     headers => {},
-    post_params => {},
+    body_params => {},
     get_params => {},
   }
 
@@ -276,7 +276,7 @@ URL template to use.
 
 Parameters to replace in the C<url> template.
 
-=item B<post_params>
+=item B<body_params>
 
 Parameters to replace in the POST body.
 
@@ -321,10 +321,10 @@ sub as_dancer($req) {
     my $body = '';
     my $headers;
     my $form_ct;
-    if( keys %{$req->{post_params}}) {
+    if( keys %{$req->{body_params}}) {
         require HTTP::Request::Common;
         my $r = HTTP::Request::Common::POST( $req->{url},
-            [ %{ $req->{post_params} }],
+            [ %{ $req->{body_params} }],
         );
         $headers = HTTP::Headers->new( %{ $req->{headers} }, $r->headers->flatten );
         $body = $r->content;
@@ -357,7 +357,7 @@ sub as_plack($req) {
     $env{ 'psgi.version' } = '1.0';
     $env{ 'psgi.url_scheme' } = delete $env{ protocol };
     $env{ 'plack.request.query_parameters' } = delete $env{ get_params };
-    $env{ 'plack.request.body_parameters' } = [%{delete $env{ post_params }||{}} ];
+    $env{ 'plack.request.body_parameters' } = [%{delete $env{ body_params }||{}} ];
     $env{ 'plack.request.headers' } = HTTP::Headers->new( %{ $req->{headers} });
     $env{ REQUEST_METHOD } = delete $env{ method };
     $env{ SCRIPT_NAME } = delete $env{ url };

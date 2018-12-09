@@ -60,7 +60,7 @@ is_deeply $requests[0], {
     protocol => 'http',
     port => 80,
     headers => {},
-    post_params => {},
+    body_params => {},
     get_params => {
         session => 'my_session_id',
         foo => 2,
@@ -77,7 +77,7 @@ is_deeply $requests[0], {
     get_params => {
         foo => [2,3],
     },
-    post_params => {
+    body_params => {
         comment => ['Some comment', 'Another comment, A++'],
     },
     headers => {
@@ -89,7 +89,7 @@ is 0+@requests, 4, 'We generate parametrized POST requests';
 @requests = generate_requests(
     method => 'POST',
     url    => '/profiles/:name/:id',
-    post_params => {
+    body_params => {
         comment => ['Some comment', 'Another comment, A++'],
     },
     headers => [

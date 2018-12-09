@@ -21,7 +21,7 @@ plan tests => 3;
 my @requests = generate_requests(
     method => 'POST',
     url    => '/feedback',
-    post_params => {
+    body_params => {
         comment => ['Some comment', 'Another comment, A++'],
     },
     headers => [
