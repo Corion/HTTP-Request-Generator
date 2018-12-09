@@ -84,9 +84,13 @@ sub fetch_all( $iterator ) {
 # or look at the history to see whether that value has passing tests somewhere
 # and then keep it?!
 
-sub fill_url( $url, $values ) {
+sub fill_url( $url, $values, $raw=undef ) {
     if( $values ) {
-        $url =~ s!/:(\w+)!'/' . uri_escape($values->{$1})!ge;
+        if( $raw ) {
+            $url =~ s!:(\w+)!exists $values->{$1} ? $values->{$1} : $1!ge;
+        } else {
+            $url =~ s!:(\w+)!exists $values->{$1} ? uri_escape($values->{$1}) : $1!ge;
+        };
     };
     $url
 };
@@ -165,7 +169,7 @@ sub _generate_requests_iter(%options) {
         if( @url_params ) {
             my %v;
             @v{ @url_params } = splice @v, 0, 0+@url_params;
-            $values{ url } = fill_url($values{ url }, \%v);
+            $values{ url } = fill_url($values{ url }, \%v, $options{ raw_params });
         };
 
         # Merge the headers as well
