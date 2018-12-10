@@ -29,7 +29,7 @@ HTTP::Generator - generate HTTP requests
         url_params => {
             name => ['Corion','Co-Rion'],
         },
-        get_params => {
+        query_params => {
             stars => [2,3],
         },
         body_params => {
@@ -84,7 +84,7 @@ our %defaults = (
     # How can we specify various values for the headers?
     headers      => [{}],
 
-    #get_params   => [],
+    #query_params   => [],
     #body_params  => [],
     #url_params   => [],
     #values       => [[]], # the list over which to iterate for *_params
@@ -141,7 +141,7 @@ sub _generate_requests_iter(%options) {
         %options = (%options, expand_pattern( $pattern ));
     };
 
-    my $get_params = $options{ get_params } || {};
+    my $query_params = $options{ query_params } || {};
     my $body_params = $options{ body_params } || {};
     my $url_params = $options{ url_params } || {};
 
@@ -154,13 +154,13 @@ sub _generate_requests_iter(%options) {
                @keys;
     @keys = sort keys %args; # somewhat predictable
     $args{ $_ } ||= {}
-        for qw(get_params body_params url_params);
+        for qw(query_params body_params url_params);
     my @loops = _makeref @args{ @keys };
 
-    # Turn all get_params into additional loops for each entry in keys %$get_params
+    # Turn all query_params into additional loops for each entry in keys %$query_params
     # Turn all body_params into additional loops over keys %$body_params
-    my @get_params = keys %$get_params;
-    push @loops, _makeref values %$get_params;
+    my @query_params = keys %$query_params;
+    push @loops, _makeref values %$query_params;
     my @body_params = keys %$body_params;
     push @loops, _makeref values %$body_params;
     my @url_params = keys %$url_params;
@@ -173,7 +173,7 @@ sub _generate_requests_iter(%options) {
     # Set up the fixed parts
     my %template;
 
-    for(qw(get_params body_params headers)) {
+    for(qw(query_params body_params headers)) {
         $template{ $_ } = $options{ "fixed_$_" } || {};
     };
     #warn "Template setup: " . Dumper \%template;
@@ -188,10 +188,10 @@ sub _generate_requests_iter(%options) {
         my @vv = splice @v, 0, 0+@keys;
         @values{ @keys } = @vv;
 
-        # Now add the get_params, if any
-        if(@get_params) {
-            my @get_values = splice @v, 0, 0+@get_params;
-            $values{ get_params } = { (%{ $values{ get_params } }, zip( @get_params, @get_values )) };
+        # Now add the query_params, if any
+        if(@query_params) {
+            my @get_values = splice @v, 0, 0+@query_params;
+            $values{ query_params } = { (%{ $values{ query_params } }, zip( @query_params, @get_values )) };
         };
         # Now add the body_params, if any
         if(@body_params) {
@@ -251,7 +251,7 @@ of choice.
     port => 80,
     headers => {},
     body_params => {},
-    get_params => {},
+    query_params => {},
   }
 
 As a shorthand for creating lists, you can use the C<pattern> option, which
@@ -265,7 +265,7 @@ lists will be expanded in memory.
 
 =item B<pattern>
 
-Generate URLs from this pattern instead of C<get_params>, C<url_params>
+Generate URLs from this pattern instead of C<query_params>, C<url_params>
 and C<url>.
 
 =item B<url>
@@ -280,7 +280,7 @@ Parameters to replace in the C<url> template.
 
 Parameters to replace in the POST body.
 
-=item B<get_params>
+=item B<query_params>
 
 Parameters to replace in the GET request.
 
@@ -344,7 +344,7 @@ sub as_dancer($req) {
     my $res = Dancer::Request->new_for_request(
         $req->{method},
         $req->{url},
-        $req->{get_params},
+        $req->{query_params},
         $body,
         $headers,
         { CONTENT_LENGTH => length($body),
@@ -368,7 +368,7 @@ sub as_plack($req) {
     my %env = %$req;
     $env{ 'psgi.version' } = '1.0';
     $env{ 'psgi.url_scheme' } = delete $env{ protocol };
-    $env{ 'plack.request.query_parameters' } = delete $env{ get_params };
+    $env{ 'plack.request.query_parameters' } = delete $env{ query_params };
     $env{ 'plack.request.body_parameters' } = [%{delete $env{ body_params }||{}} ];
     $env{ 'plack.request.headers' } = HTTP::Headers->new( %{ $req->{headers} });
     $env{ REQUEST_METHOD } = delete $env{ method };
