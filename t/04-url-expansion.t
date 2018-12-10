@@ -3,7 +3,7 @@ use strict;
 use Test::More tests => 8;
 use Data::Dumper;
 
-use HTTP::Generator 'generate_requests';
+use HTTP::Request::Generator 'generate_requests';
 
 sub expand_url {
     my( $pattern ) = @_;

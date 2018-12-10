@@ -1,4 +1,4 @@
-package HTTP::Generator;
+package HTTP::Request::Generator;
 use strict;
 use Filter::signatures;
 use feature 'signatures';
@@ -10,9 +10,11 @@ use Exporter 'import';
 
 =head1 NAME
 
-HTTP::Generator - generate HTTP requests
+HTTP::Request::Generator - generate HTTP requests
 
 =head1 SYNOPSIS
+
+    use HTTP::Request::Generator 'generate_requests';
 
     @requests = generate_requests(
         method  => 'GET',
@@ -55,7 +57,7 @@ HTTP::Generator - generate HTTP requests
 =cut
 
 our $VERSION = '0.01';
-our @EXPORT_OK = qw( generate_requests as_dancer as_plack);
+our @EXPORT_OK = qw( generate_requests as_dancer as_plack as_http_request);
 
 sub unwrap($item,$default) {
     defined $item
@@ -312,6 +314,43 @@ sub generate_requests(%options) {
     } else {
         return $i
     }
+}
+
+=head2 C<< as_http_request >>
+
+Converts the request data to a L<HTTP::Request> object.
+
+=cut
+
+sub as_http_request($req) {
+    require HTTP::Request;
+    require URI;
+    require URI::QueryParam;
+
+    my $body = '';
+    my $headers;
+    my $form_ct;
+    if( keys %{$req->{body_params}}) {
+        require HTTP::Request::Common;
+        my $r = HTTP::Request::Common::POST( $req->{url},
+            [ %{ $req->{body_params} }],
+        );
+        $headers = HTTP::Headers->new( %{ $req->{headers} }, $r->headers->flatten );
+        $body = $r->content;
+        $form_ct = $r->content_type;
+    } else {
+        $headers = HTTP::Headers->new( %$headers );
+    };
+
+    # Store metadata / generate "signature" for later inspection/isolation?
+    my $uri = URI->new( $req->{url} );
+    $uri->query_param( %{ $req->{query_params} || {} });
+    my $res = HTTP::Request->new(
+        $req->{method} => $uri,
+        $headers,
+        $body,
+    );
+    $res
 }
 
 =head2 C<< as_dancer >>

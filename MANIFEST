@@ -1,6 +1,6 @@
 .gitignore
 Changes
-lib/HTTP/Generator.pm
+lib/HTTP/Request/Generator.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files

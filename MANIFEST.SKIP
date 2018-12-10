@@ -21,6 +21,6 @@ Makefile$
 ^.releaserc
 ^.*.cmd
 ^chrome-versions
-^HTTP-Generator
+^HTTP-Request-Generator
 ^frame-\d+.png
 ^demo/

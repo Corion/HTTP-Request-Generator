@@ -1,6 +1,6 @@
 #!perl -w
 use strict;
-use HTTP::Generator qw(generate_requests);
+use HTTP::Request::Generator qw(generate_requests);
 use Data::Dumper;
 
 use Test::More tests => 15;
@@ -17,19 +17,19 @@ is 0+@requests, 2, 'We get two data instances for "url" parameter';
 @requests = generate_requests(
     method => ['POST','GET'],
     url    => ['/','/index.html'],
-    #get_params => ['foo','bar','baz'],
-    get_params => {
+    #query_params => ['foo','bar','baz'],
+    query_params => {
         foo => [1,2,3],
         bar => [4,5,6],
         baz => [7,8,9],
     },
-    fixed_get_params => {
+    fixed_query_params => {
         session => 'my_session_id',
     },
 );
 is 0+@requests, 2*2*3*3*3, 'The amount of generated instances multiplies';
-ok exists $requests[0]->{get_params}, 'Fixed get parameters get added';
-my @without_session = grep { $requests[0]->{get_params}->{session} ne 'my_session_id' } @requests;
+ok exists $requests[0]->{query_params}, 'Fixed get parameters get added';
+my @without_session = grep { $requests[0]->{query_params}->{session} ne 'my_session_id' } @requests;
 is 0+@without_session, 0, 'Fixed parameters get added everywhere'
     or diag Dumper \@without_session;
 
@@ -40,19 +40,19 @@ is 0+@without_session, 0, 'Fixed parameters get added everywhere'
         name => ['Corion','Co-Rion'],
         id   => [1,2],
     },
-    get_params => {
+    query_params => {
         foo => [2,3],
     },
-    fixed_get_params => {
+    fixed_query_params => {
         session => 'my_session_id',
     },
 );
 is 0+@requests, 8, 'We generate parametrized URLs';
 is $requests[0]->{url}, '/profiles/Corion/1', 'The first URL matches'
     or diag Dumper $requests[0];
-is $requests[0]->{get_params}->{foo}, 2, 'Get parameters vary'
+is $requests[0]->{query_params}->{foo}, 2, 'Get parameters vary'
     or diag Dumper \@requests;
-is $requests[0]->{get_params}->{session}, 'my_session_id', 'Fixed parameters get added'
+is $requests[0]->{query_params}->{session}, 'my_session_id', 'Fixed parameters get added'
     or diag Dumper $requests[0];
 is_deeply $requests[0], {
     method => 'GET',
@@ -61,7 +61,7 @@ is_deeply $requests[0], {
     port => 80,
     headers => {},
     body_params => {},
-    get_params => {
+    query_params => {
         session => 'my_session_id',
         foo => 2,
     },
@@ -74,7 +74,7 @@ is_deeply $requests[0], {
         name => 'Corion',
         id   => 1,
     },
-    get_params => {
+    query_params => {
         foo => [2,3],
     },
     body_params => {

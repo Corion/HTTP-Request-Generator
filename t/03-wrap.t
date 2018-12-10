@@ -1,6 +1,6 @@
 #!perl -w
 use strict;
-use HTTP::Generator qw(generate_requests);
+use HTTP::Request::Generator qw(generate_requests);
 use Data::Dumper;
 use Test::More;
 
@@ -27,7 +27,7 @@ my @requests = generate_requests(
     headers => [
     { "Content-Type" => 'text/plain; encoding=UTF-8', },
     ],
-    wrap => \&HTTP::Generator::as_dancer,
+    wrap => \&HTTP::Request::Generator::as_dancer,
 );
 is 0+@requests, 2, 'We generate parametrized POST requests';
 isa_ok $requests[0], 'Dancer::Request', 'Returned data';

@@ -1,12 +1,14 @@
 
-[![Travis Build Status](https://travis-ci.org/Corion/HTTP-Generator.svg?branch=master)](https://travis-ci.org/Corion/HTTP-Generator)
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/HTTP-Generator?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/HTTP-Generator)
+[![Travis Build Status](https://travis-ci.org/Corion/HTTP-Request-Generator.svg?branch=master)](https://travis-ci.org/Corion/HTTP-Request-Generator)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/HTTP-Request-Generator?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/HTTP-Request-Generator)
 
 # NAME
 
-HTTP::Generator - generate HTTP requests
+HTTP::Request::Generator - generate HTTP requests
 
 # SYNOPSIS
+
+    use HTTP::Request::Generator 'generate_requests';
 
     @requests = generate_requests(
         method  => 'GET',
@@ -23,7 +25,7 @@ HTTP::Generator - generate HTTP requests
         url_params => {
             name => ['Corion','Co-Rion'],
         },
-        get_params => {
+        query_params => {
             stars => [2,3],
         },
         body_params => {
@@ -83,7 +85,7 @@ of choice.
       port => 80,
       headers => {},
       body_params => {},
-      get_params => {},
+      query_params => {},
     }
 
 As a shorthand for creating lists, you can use the `pattern` option, which
@@ -95,7 +97,7 @@ lists will be expanded in memory.
 
 - **pattern**
 
-    Generate URLs from this pattern instead of `get_params`, `url_params`
+    Generate URLs from this pattern instead of `query_params`, `url_params`
     and `url`.
 
 - **url**
@@ -110,7 +112,7 @@ lists will be expanded in memory.
 
     Parameters to replace in the POST body.
 
-- **get\_params**
+- **query\_params**
 
     Parameters to replace in the GET request.
 
@@ -130,6 +132,10 @@ lists will be expanded in memory.
 - **limit**
 
     Limit the number of requests generated.
+
+## `as_http_request`
+
+Converts the request data to a [HTTP::Request](https://metacpan.org/pod/HTTP::Request) object.
 
 ## `as_dancer`
 
