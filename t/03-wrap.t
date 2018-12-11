@@ -6,7 +6,8 @@ use Test::More;
 
 my $ok = eval {
     require HTTP::Headers;
-    require Plack::Request;
+    require HTTP::Request::Common;
+    require Dancer::Request;
     require Hash::MultiValue;
     1;
 };

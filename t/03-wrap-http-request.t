@@ -7,6 +7,7 @@ use Test::More;
 my $ok = eval {
     require HTTP::Headers;
     require HTTP::Request;
+    require HTTP::Request::Common;
     require URI;
     1;
 };

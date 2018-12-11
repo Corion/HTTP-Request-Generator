@@ -106,7 +106,7 @@ for my $test_file (@tests) {
             system( @cmd );
         };
         if( $exit != 0 ) {
-            push @failed, [ $candidate, [@cmd]];
+            push @failed, [ $candidate, [@cmd], $stderr];
         } elsif( $? != 0 ) {
             push @failed, [ $candidate, [@cmd]];
         };
