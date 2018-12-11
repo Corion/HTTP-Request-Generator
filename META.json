@@ -12,7 +12,7 @@
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
       "version" : 2
    },
-   "name" : "HTTP-Generator",
+   "name" : "HTTP-Request-Generator",
    "no_index" : {
       "directory" : [
          "t",
@@ -51,8 +51,8 @@
    "resources" : {
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/Corion/HTTP-Generator.git",
-         "web" : "https://github.com/Corion/HTTP-Generator"
+         "url" : "git://github.com/Corion/HTTP-Request-Generator.git",
+         "web" : "https://github.com/Corion/HTTP-Request-Generator"
       }
    },
    "version" : "0.01",

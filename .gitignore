@@ -4,8 +4,8 @@ Makefile.old
 *.bak
 pm_to_blib
 blib/
-HTTP-Generator-*
-HTTP-Generator-*/
+HTTP-Request-Generator-*
+HTTP-Request-Generator-*/
 .releaserc
 cover_db
 firefox-versions/

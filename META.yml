@@ -14,7 +14,7 @@ license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
-name: HTTP-Generator
+name: HTTP-Request-Generator
 no_index:
   directory:
     - t
@@ -27,7 +27,7 @@ requires:
   URI::Escape: '0'
   perl: '5.006'
 resources:
-  repository: git://github.com/Corion/HTTP-Generator.git
+  repository: git://github.com/Corion/HTTP-Request-Generator.git
 version: '0.01'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1
