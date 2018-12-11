@@ -407,9 +407,9 @@ sub as_plack($req) {
     my %env = %$req;
     $env{ 'psgi.version' } = '1.0';
     $env{ 'psgi.url_scheme' } = delete $env{ protocol };
-    $env{ 'plack.request.query_parameters' } = delete $env{ query_params };
+    $env{ 'plack.request.query_parameters' } = [%{delete $env{ query_params }||{}} ];
     $env{ 'plack.request.body_parameters' } = [%{delete $env{ body_params }||{}} ];
-    $env{ 'plack.request.headers' } = HTTP::Headers->new( %{ $req->{headers} });
+    $env{ 'plack.request.headers' } = HTTP::Headers->new( %{ delete $req->{headers} });
     $env{ REQUEST_METHOD } = delete $env{ method };
     $env{ SCRIPT_NAME } = delete $env{ url };
     $env{ QUERY_STRING } = ''; # not correct, but...

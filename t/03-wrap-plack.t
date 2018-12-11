@@ -17,20 +17,23 @@ if( !$ok) {
     exit;
 };
 
-plan tests => 3;
+plan tests => 4;
 
 my @requests = generate_requests(
     method => 'POST',
-    url    => '/feedback',
+    url    => '/feedback/:item',
     body_params => {
         comment => ['Some comment', 'Another comment, A++'],
+    },
+    query_params => {
+        item => [1,2],
     },
     headers => [
     { "Content-Type" => 'text/plain; encoding=UTF-8', },
     ],
     wrap => \&HTTP::Request::Generator::as_plack,
 );
-is 0+@requests, 2, 'We generate parametrized POST requests';
+is 0+@requests, 4, 'We generate parametrized POST requests';
 isa_ok $requests[0], 'Plack::Request', 'Returned data';
-is $requests[0]->parameters->{'comment'}, 'Some comment';
-warn Dumper $requests[0]->body_parameters;
+is $requests[0]->parameters->{'comment'}, 'Some comment', "We fetch the correct body parameter";
+is $requests[0]->parameters->{'item'}, '1', "We fetch the correct query parameter";
