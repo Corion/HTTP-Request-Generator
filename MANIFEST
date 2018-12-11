@@ -11,6 +11,7 @@ README
 README.mkdn
 t/00-load.t
 t/02-http-generator.t
+t/03-wrap-http-request.t
 t/03-wrap-plack.t
 t/03-wrap.t
 t/04-url-expansion.t
