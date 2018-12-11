@@ -7,6 +7,7 @@ use Test::More;
 # Skip if unavailable
 my $ok = eval {
     require Plack::Request;
+    Plack::Request->VERSION(1.0030); # for ->parameters to work correctly
     require HTTP::Headers;
     require Hash::MultiValue;
     1;
