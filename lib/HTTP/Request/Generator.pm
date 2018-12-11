@@ -318,6 +318,12 @@ sub generate_requests(%options) {
 
 =head2 C<< as_http_request >>
 
+    generate_requests(
+        method => 'POST',
+        url    => '/feedback/:item',
+        wrap => \&HTTP::Request::Generator::as_http_request,
+    )
+
 Converts the request data to a L<HTTP::Request> object.
 
 =cut
@@ -354,6 +360,12 @@ sub as_http_request($req) {
 }
 
 =head2 C<< as_dancer >>
+
+    generate_requests(
+        method => 'POST',
+        url    => '/feedback/:item',
+        wrap => \&HTTP::Request::Generator::as_dancer,
+    )
 
 Converts the request data to a L<Dancer::Request> object.
 
@@ -394,6 +406,12 @@ sub as_dancer($req) {
 }
 
 =head2 C<< as_plack >>
+
+    generate_requests(
+        method => 'POST',
+        url    => '/feedback/:item',
+        wrap => \&HTTP::Request::Generator::as_plack,
+    )
 
 Converts the request data to a L<Plack::Request> object.
 

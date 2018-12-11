@@ -135,13 +135,31 @@ lists will be expanded in memory.
 
 ## `as_http_request`
 
+    generate_requests(
+        method => 'POST',
+        url    => '/feedback/:item',
+        wrap => \&HTTP::Request::Generator::as_http_request,
+    )
+
 Converts the request data to a [HTTP::Request](https://metacpan.org/pod/HTTP::Request) object.
 
 ## `as_dancer`
 
+    generate_requests(
+        method => 'POST',
+        url    => '/feedback/:item',
+        wrap => \&HTTP::Request::Generator::as_dancer,
+    )
+
 Converts the request data to a [Dancer::Request](https://metacpan.org/pod/Dancer::Request) object.
 
 ## `as_plack`
+
+    generate_requests(
+        method => 'POST',
+        url    => '/feedback/:item',
+        wrap => \&HTTP::Request::Generator::as_plack,
+    )
 
 Converts the request data to a [Plack::Request](https://metacpan.org/pod/Plack::Request) object.
 
