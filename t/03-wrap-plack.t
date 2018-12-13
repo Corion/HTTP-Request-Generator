@@ -9,6 +9,7 @@ my $ok = eval {
     require Plack::Request;
     Plack::Request->VERSION(1.0030); # for ->parameters to work correctly
     require HTTP::Headers;
+    HTTP::Headers->VERSION(6.07); # for ->flatten()
     require Hash::MultiValue;
     1;
 };

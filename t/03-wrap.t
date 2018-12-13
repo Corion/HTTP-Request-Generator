@@ -6,6 +6,7 @@ use Test::More;
 
 my $ok = eval {
     require HTTP::Headers;
+    HTTP::Headers->VERSION(6.07); # for ->flatten()
     require HTTP::Request::Common;
     require Dancer::Request;
     require Hash::MultiValue;

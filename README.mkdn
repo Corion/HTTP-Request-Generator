@@ -166,3 +166,30 @@ Converts the request data to a [Plack::Request](https://metacpan.org/pod/Plack::
 # SEE ALSO
 
 [The Curl Manpage](https://curl.haxx.se/docs/manpage.html) for the pattern syntax
+
+# REPOSITORY
+
+The public repository of this module is
+[https://github.com/Corion/HTTP-Request-Generator](https://github.com/Corion/HTTP-Request-Generator).
+
+# SUPPORT
+
+The public support forum of this module is [https://perlmonks.org/](https://perlmonks.org/).
+
+# BUG TRACKER
+
+Please report bugs in this module via the RT CPAN bug queue at
+[https://rt.cpan.org/Public/Dist/Display.html?Name=HTTP-Request-Generator](https://rt.cpan.org/Public/Dist/Display.html?Name=HTTP-Request-Generator)
+or via mail to [HTTP-Request-Generator-Bugs@rt.cpan.org](mailto:HTTP-Request-Generator-Bugs@rt.cpan.org).
+
+# AUTHOR
+
+Max Maischein `corion@cpan.org`
+
+# COPYRIGHT (c)
+
+Copyright 2017-2018 by Max Maischein `corion@cpan.org`.
+
+# LICENSE
+
+This module is released under the same terms as Perl itself.
