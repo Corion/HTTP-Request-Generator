@@ -1,4 +1,4 @@
-0.02 2018-12-16
+0.03 2018-12-16
     * Up the Plack::Request prerequisite in an attempt to narrow it down some
       more (instead of setting it to 1.0047, the current version that is known
       to work)
