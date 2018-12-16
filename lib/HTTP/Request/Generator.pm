@@ -56,7 +56,7 @@ HTTP::Request::Generator - generate HTTP requests
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 our @EXPORT_OK = qw( generate_requests as_dancer as_plack as_http_request);
 
 sub unwrap($item,$default) {
