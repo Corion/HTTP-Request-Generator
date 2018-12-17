@@ -330,6 +330,7 @@ Converts the request data to a L<HTTP::Request> object.
 
 sub as_http_request($req) {
     require HTTP::Request;
+    HTTP::Request->VERSION(6); # ->flatten()
     require URI;
     require URI::QueryParam;
 
@@ -373,7 +374,8 @@ Converts the request data to a L<Dancer::Request> object.
 
 sub as_dancer($req) {
     require Dancer::Request;
-    # Also, HTTP::Message 6+ for ->flatten()
+    require HTTP::Request;
+    HTTP::Request->VERSION(6); # ->flatten()
 
     my $body = '';
     my $headers;
@@ -419,6 +421,7 @@ Converts the request data to a L<Plack::Request> object.
 
 sub as_plack($req) {
     require Plack::Request;
+    Plack::Request->VERSION(1.0047);
     require HTTP::Headers;
     require Hash::MultiValue;
 
