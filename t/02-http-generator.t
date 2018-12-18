@@ -3,7 +3,7 @@ use strict;
 use HTTP::Request::Generator qw(generate_requests);
 use Data::Dumper;
 
-use Test::More tests => 15;
+use Test::More tests => 25;
 
 my @requests = generate_requests();
 is 0+@requests, 1;
@@ -59,6 +59,7 @@ is_deeply $requests[0], {
     url => '/profiles/Corion/1',
     protocol => 'http',
     port => 80,
+    host => '',
     headers => {},
     body_params => {},
     query_params => {
@@ -101,3 +102,30 @@ is 0+@requests, 4, 'We generate parametrized POST requests';
 is $requests[0]->{url}, '/profiles/:name/:id', "Unparametrized URLs don't get interpolated";
 is_deeply $requests[0]->{headers}, {'Content-Type' => 'text/plain; encoding=UTF-8'}, "Headers get added";
 is_deeply $requests[2]->{headers}, {'Content-Type' => 'text/plain; encoding=Latin-1'}, "Headers get iterated";
+
+@requests = generate_requests(
+    method => 'GET',
+    url    => 'https://example.com/profiles',
+    port   => [443, 8080, 8443],
+);
+is 0+@requests, 3, 'We generate requests parametrized across ports';
+is $requests[0]->{port}, 443,  "port numbers get expanded";
+is $requests[1]->{port}, 8080, "port numbers get expanded";
+is $requests[2]->{port}, 8443, "port numbers get expanded";
+
+@requests = generate_requests(
+    method   => 'GET',
+    protocol => ['http', 'https'],
+    url      => 'https://example.com/',
+);
+is 0+@requests, 2, 'We generate requests parametrized across protocols';
+is $requests[0]->{protocol}, 'http', "Protocol works";
+is $requests[1]->{protocol}, 'https', "Protocol works";
+
+@requests = generate_requests(
+    host     => ['example.com', 'www.example.com'],
+    url      => '/foo',
+);
+is 0+@requests, 2, 'We generate requests parametrized across hostnames';
+is $requests[0]->{host}, 'example.com', "Hostnames work";
+is $requests[1]->{host}, 'www.example.com', "Hostnames work";

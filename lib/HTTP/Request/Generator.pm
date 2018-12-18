@@ -27,6 +27,7 @@ HTTP::Request::Generator - generate HTTP requests
 
     @requests = generate_requests(
         method => 'POST',
+        host   => ['example.com','www.example.com'],
         url    => '/profiles/:name',
         url_params => {
             name => ['Corion','Co-Rion'],
@@ -48,7 +49,7 @@ HTTP::Request::Generator - generate HTTP requests
             },
         ],
     );
-    # Generates 16 requests out of the combinations
+    # Generates 32 requests out of the combinations
 
     for my $req (@requests) {
         $ua->request( $req );
@@ -80,6 +81,7 @@ sub fetch_all( $iterator, $limit=0 ) {
 our %defaults = (
     method       => ['GET'],
     url          => ['/'],
+    host         => [''],
     port         => [80],
     protocol     => ['http'],
 
@@ -146,6 +148,8 @@ sub _generate_requests_iter(%options) {
     my $query_params = $options{ query_params } || {};
     my $body_params = $options{ body_params } || {};
     my $url_params = $options{ url_params } || {};
+    my $port_params = $options{ port } || [];
+    my $host_params = $options{ host } || [];
 
     $options{ "fixed_$_" } ||= {}
         for @keys;
@@ -158,6 +162,7 @@ sub _generate_requests_iter(%options) {
     $args{ $_ } ||= {}
         for qw(query_params body_params url_params);
     my @loops = _makeref @args{ @keys };
+    #use Data::Dumper; warn Dumper \@loops;
 
     # Turn all query_params into additional loops for each entry in keys %$query_params
     # Turn all body_params into additional loops over keys %$body_params
@@ -168,7 +173,7 @@ sub _generate_requests_iter(%options) {
     my @url_params = keys %$url_params;
     push @loops, _makeref values %$url_params;
 
-    #warn "Looping over " . Dumper \@loops;
+    #use Data::Dumper; warn "Looping over " . Dumper \@loops;
 
     my $iter = NestedLoops(\@loops,{});
 
@@ -178,7 +183,6 @@ sub _generate_requests_iter(%options) {
     for(qw(query_params body_params headers)) {
         $template{ $_ } = $options{ "fixed_$_" } || {};
     };
-    #warn "Template setup: " . Dumper \%template;
 
     return sub {
         my @v = $iter->();
@@ -214,6 +218,16 @@ sub _generate_requests_iter(%options) {
 
         return $wrapper->(\%values);
     };
+}
+
+sub _build_uri( $req ) {
+    my $uri = URI->new( $req->{url}, $req->{protocol} );
+    if( $req->{host}) {
+        $uri->host( $req->{host});
+    };
+    $uri->scheme( $req->{protocol});
+    $uri->port( $req->{port}) if( $req->{port} != $uri->default_port );
+    $uri
 }
 
 =head2 C<< generate_requests( %options ) >>
@@ -350,7 +364,7 @@ sub as_http_request($req) {
     };
 
     # Store metadata / generate "signature" for later inspection/isolation?
-    my $uri = URI->new( $req->{url} );
+    my $uri = _build_uri( $req );
     $uri->query_param( %{ $req->{query_params} || {} });
     my $res = HTTP::Request->new(
         $req->{method} => $uri,
@@ -392,18 +406,28 @@ sub as_dancer($req) {
         $headers = HTTP::Headers->new( %$headers );
     };
 
+    my $uri = _build_uri( $req );
+
     # Store metadata / generate "signature" for later inspection/isolation?
     local %ENV; # wipe out non-overridable default variables of Dancer::Request
     my $res = Dancer::Request->new_for_request(
-        $req->{method},
-        $req->{url},
+        $req->{method} =>  $uri->path,
         $req->{query_params},
         $body,
         $headers,
         { CONTENT_LENGTH => length($body),
-          CONTENT_TYPE => $form_ct },
+          CONTENT_TYPE   => $form_ct,
+          HTTP_HOST      => (join ":", $req->{host}, $req->{port}),
+          SERVER_NAME    => $req->{host},
+          SERVER_PORT    => $req->{port},
+          REQUEST_METHOD => $req->{ method },
+          REQUEST_URI    => $uri,
+          SCRIPT_NAME    => $uri->path,
+
+        },
     );
     $res->{_http_body}->add($body);
+    #use Data::Dumper; warn Dumper $res;
     $res
 }
 
@@ -432,7 +456,9 @@ sub as_plack($req) {
     $env{ 'plack.request.body_parameters' } = [%{delete $env{ body_params }||{}} ];
     $env{ 'plack.request.headers' } = HTTP::Headers->new( %{ delete $req->{headers} });
     $env{ REQUEST_METHOD } = delete $env{ method };
-    $env{ SCRIPT_NAME } = delete $env{ url };
+    $env{ REQUEST_URI } = _build_uri( $req );
+    $env{ SCRIPT_NAME } = $env{ REQUEST_URI }->path;
+    delete $env{ url };
     $env{ QUERY_STRING } = ''; # not correct, but...
     $env{ SERVER_NAME } = delete $env{ host };
     $env{ SERVER_PORT } = delete $env{ port };
