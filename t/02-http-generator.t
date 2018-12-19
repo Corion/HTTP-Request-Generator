@@ -10,13 +10,13 @@ is 0+@requests, 1;
 
 @requests = generate_requests(
     method => 'GET',
-    url    => ['/','/index.html'],
+    path   => ['/','/index.html'],
 );
 is 0+@requests, 2, 'We get two data instances for "url" parameter';
 
 @requests = generate_requests(
     method => ['POST','GET'],
-    url    => ['/','/index.html'],
+    path   => ['/','/index.html'],
     #query_params => ['foo','bar','baz'],
     query_params => {
         foo => [1,2,3],
@@ -35,7 +35,7 @@ is 0+@without_session, 0, 'Fixed parameters get added everywhere'
 
 @requests = generate_requests(
     method => 'GET',
-    url    => '/profiles/:name/:id',
+    path   => '/profiles/:name/:id',
     url_params => {
         name => ['Corion','Co-Rion'],
         id   => [1,2],
@@ -48,7 +48,7 @@ is 0+@without_session, 0, 'Fixed parameters get added everywhere'
     },
 );
 is 0+@requests, 8, 'We generate parametrized URLs';
-is $requests[0]->{url}, '/profiles/Corion/1', 'The first URL matches'
+is $requests[0]->{url}, '/profiles/Corion/1', 'The first pathmatches'
     or diag Dumper $requests[0];
 is $requests[0]->{query_params}->{foo}, 2, 'Get parameters vary'
     or diag Dumper \@requests;
@@ -56,7 +56,7 @@ is $requests[0]->{query_params}->{session}, 'my_session_id', 'Fixed parameters g
     or diag Dumper $requests[0];
 is_deeply $requests[0], {
     method => 'GET',
-    url    => '/profiles/Corion/1',
+    path   => '/profiles/Corion/1',
     scheme => 'http',
     port => 80,
     host => '',
@@ -70,7 +70,7 @@ is_deeply $requests[0], {
 
 @requests = generate_requests(
     method => 'POST',
-    url    => '/profiles/:name/:id',
+    path   => '/profiles/:name/:id',
     url_params => {
         name => 'Corion',
         id   => 1,
@@ -89,7 +89,7 @@ is 0+@requests, 4, 'We generate parametrized POST requests';
 
 @requests = generate_requests(
     method => 'POST',
-    url    => '/profiles/:name/:id',
+    path   => '/profiles/:name/:id',
     body_params => {
         comment => ['Some comment', 'Another comment, A++'],
     },
@@ -105,7 +105,7 @@ is_deeply $requests[2]->{headers}, {'Content-Type' => 'text/plain; encoding=Lati
 
 @requests = generate_requests(
     method => 'GET',
-    url    => 'https://example.com/profiles',
+    path   => 'https://example.com/profiles',
     port   => [443, 8080, 8443],
 );
 is 0+@requests, 3, 'We generate requests parametrized across ports';
@@ -124,7 +124,7 @@ is $requests[1]->{scheme  }, 'https', "scheme   works";
 
 @requests = generate_requests(
     host     => ['example.com', 'www.example.com'],
-    url      => '/foo',
+    path     => '/foo',
 );
 is 0+@requests, 2, 'We generate requests parametrized across hostnames';
 is $requests[0]->{host}, 'example.com', "Hostnames work";
