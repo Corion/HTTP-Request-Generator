@@ -5,6 +5,7 @@ use feature 'signatures';
 no warnings 'experimental::signatures';
 use Algorithm::Loops 'NestedLoops';
 use List::MoreUtils 'zip';
+use URI;
 use URI::Escape;
 use Exporter 'import';
 
@@ -28,7 +29,7 @@ HTTP::Request::Generator - generate HTTP requests
     @requests = generate_requests(
         method => 'POST',
         host   => ['example.com','www.example.com'],
-        url    => '/profiles/:name',
+        path   => '/profiles/:name',
         url_params => {
             name => ['Corion','Co-Rion'],
         },
@@ -80,9 +81,9 @@ sub fetch_all( $iterator, $limit=0 ) {
 
 our %defaults = (
     method       => ['GET'],
-    url          => ['/'],
+    path         => ['/'],
     host         => [''],
-    port         => [80],
+    port         => [0],
     scheme       => ['http'],
 
     # How can we specify various values for the headers?
@@ -117,22 +118,49 @@ sub _makeref {
     } @_
 }
 
+sub _extract_enum( $name, $item ) {
+    # Explicitly enumerate all ranges
+    my @res = @{ $defaults{ $name } || []};
+
+    if( $item ) {
+        # Expand all ranges into the enumerated lists
+        $item =~ s!\[([^.]+)\.\.([^.]+)\]!"{" . join(",", $1..$2 )."}"!ge;
+
+        # Explode all enumerated items into their list
+        if( $item =~ /^([^{]*)\{([^}]+)\}([^{]*)$/ ) {
+            my($pre, $post) = ($1,$3);
+            @res = map { "$pre$_$post" } split /,/, $2, -1;
+        } else {
+            @res = $item;
+        };
+    };
+
+    return \@res
+}
+
 # Convert a curl-style https://{www.,}example.com/foo-[00..99].html to
 #                      https://:1example.com/foo-:2.html
 sub expand_pattern( $pattern ) {
     my %ranges;
 
-    my $idx = 0;
+    # Split up the URL pattern into a scheme, host(pattern), port number and
+    # path (pattern)
+    my( $scheme, $host, $port, $path ) = $pattern =~ m!^(?:([^:]+):)?/?/?(?:([^/:]+))(?::(\d+))?(.*)$!;
 
     # Explicitly enumerate all ranges
-    $pattern =~ s!\[([^.]+)\.\.([^.]+)\]!$ranges{$idx} = [$1..$2]; ":".$idx++!ge;
+    my $idx = 0;
+
+    $path =~ s!\[([^.]+)\.\.([^.]+)\]!$ranges{$idx} = [$1..$2]; ":".$idx++!ge;
 
     # Move all explicitly enumerated parts into lists:
-    $pattern =~ s!\{([^\}]*)\}!$ranges{$idx} = [split /,/, $1, -1]; ":".$idx++!ge;
+    $path =~ s!\{([^\}]*)\}!$ranges{$idx} = [split /,/, $1, -1]; ":".$idx++!ge;
 
-    return (
-        url        => $pattern,
+    my %res = (
+        path      => $path,
         url_params => \%ranges,
+        host       => _extract_enum( 'host', $host ),
+        scheme     => _extract_enum( 'scheme', $scheme ),
+        port       => _extract_enum( 'port', $port ),
         raw_params => 1,
     );
 }
@@ -162,7 +190,7 @@ sub _generate_requests_iter(%options) {
     $args{ $_ } ||= {}
         for qw(query_params body_params url_params);
     my @loops = _makeref @args{ @keys };
-    #use Data::Dumper; warn Dumper \@loops;
+    #use Data::Dumper; warn Dumper \@loops, \@keys;
 
     # Turn all query_params into additional loops for each entry in keys %$query_params
     # Turn all body_params into additional loops over keys %$body_params
@@ -187,7 +215,7 @@ sub _generate_requests_iter(%options) {
     return sub {
         my @v = $iter->();
         return unless @v;
-        #warn Dumper \@v;
+        #use Data::Dumper; warn Dumper \@v;
 
         # Patch in the new values
         my %values = %template;
@@ -209,13 +237,15 @@ sub _generate_requests_iter(%options) {
         if( @url_params ) {
             my %v;
             @v{ @url_params } = splice @v, 0, 0+@url_params;
-            $values{ url } = fill_url($values{ url }, \%v, $options{ raw_params });
+            #use Data::Dumper; warn Dumper \%values;
+            $values{ path } = fill_url($values{ path }, \%v, $options{ raw_params });
         };
+
+        $values{ url } = _build_uri( \%values );
 
         # Merge the headers as well
         #warn "Merging headers: " . Dumper($values{headers}). " + " . (Dumper $template{headers});
         %{$values{headers}} = (%{$template{headers}}, %{$values{headers} || {}});
-
         return $wrapper->(\%values);
     };
 }
@@ -226,7 +256,8 @@ sub _build_uri( $req ) {
         $uri->host( $req->{host});
     };
     $uri->scheme( $req->{scheme});
-    $uri->port( $req->{port}) if( $req->{port} != $uri->default_port );
+    $uri->port( $req->{port}) if( $req->{port} and $req->{port} != $uri->default_port );
+    $uri->path( $req->{path});
     $uri
 }
 
