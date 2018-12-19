@@ -66,7 +66,9 @@ is_deeply $requests[0], {
         session => 'my_session_id',
         foo => 2,
     },
-}, "The structure is as we expect";
+    url => URI->new('/profiles/Corion/1', 'http'),
+}, "The structure is as we expect"
+or diag Dumper $requests[0];
 
 @requests = generate_requests(
     method => 'POST',

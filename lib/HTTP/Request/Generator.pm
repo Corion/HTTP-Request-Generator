@@ -251,12 +251,12 @@ sub _generate_requests_iter(%options) {
 }
 
 sub _build_uri( $req ) {
-    my $uri = URI->new( $req->{url}, $req->{scheme} );
+    my $uri = URI->new( '', $req->{scheme} );
     if( $req->{host}) {
         $uri->host( $req->{host});
+        $uri->scheme( $req->{scheme});
+        $uri->port( $req->{port}) if( $req->{port} and $req->{port} != $uri->default_port );
     };
-    $uri->scheme( $req->{scheme});
-    $uri->port( $req->{port}) if( $req->{port} and $req->{port} != $uri->default_port );
     $uri->path( $req->{path});
     $uri
 }
