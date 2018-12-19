@@ -33,9 +33,11 @@
       "runtime" : {
          "requires" : {
             "Algorithm::Loops" : "0",
+            "Carp" : "0",
             "Exporter" : "5",
             "Filter::signatures" : "0",
             "List::MoreUtils" : "0",
+            "URI" : "0",
             "URI::Escape" : "0",
             "perl" : "5.006"
          }
