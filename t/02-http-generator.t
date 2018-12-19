@@ -105,7 +105,7 @@ is_deeply $requests[2]->{headers}, {'Content-Type' => 'text/plain; encoding=Lati
 
 @requests = generate_requests(
     method => 'GET',
-    path   => 'https://example.com/profiles',
+    url    => 'https://example.com/profiles',
     port   => [443, 8080, 8443],
 );
 is 0+@requests, 3, 'We generate requests parametrized across ports';
