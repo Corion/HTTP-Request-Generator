@@ -58,7 +58,7 @@ is_deeply $requests[0], {
     method => 'GET',
     path   => '/profiles/Corion/1',
     scheme => 'http',
-    port => 80,
+    port   => 0,
     host => '',
     headers => {},
     body_params => {},
