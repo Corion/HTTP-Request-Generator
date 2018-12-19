@@ -46,7 +46,7 @@ is $requests[0]->url->query_param('item'), '1', "We fetch the correct query para
 @requests = generate_requests(
     method   => 'GET',
     host     => ['example.com', 'www.example.com'],
-    protocol => ['http', 'https'],
+    scheme   => ['http', 'https'],
     port     => [443,8443],
     url      => '/',
     wrap => \&HTTP::Request::Generator::as_http_request,
@@ -65,5 +65,5 @@ is_deeply \@urls, [
     'https://example.com:8443/',
     'https://www.example.com/',
     'https://www.example.com:8443/',
-], "Protocols, hostnames and ports get iterated correctly"
+], "scheme  s, hostnames and ports get iterated correctly"
     or diag Dumper \@urls;

@@ -33,17 +33,18 @@ my @requests = generate_requests(
 );
 is 0+@requests, 2, 'We generate parametrized POST requests';
 isa_ok $requests[0], 'Dancer::Request', 'Returned data';
-is $requests[0]->params('body')->{'comment'}, 'Some comment';
+is $requests[0]->params('body')->{'comment'}, 'Some comment', "Body parameter value";
 
 @requests = generate_requests(
     method   => 'GET',
     host     => ['example.com', 'www.example.com'],
-    protocol => ['http', 'https'],
+    scheme   => ['http', 'https'],
     port     => [443,8443],
     url      => '/',
     wrap => \&HTTP::Request::Generator::as_dancer,
 );
-is 0+@requests, 8, 'We generate parametrized GET requests';
+is 0+@requests, 8, 'We generate parametrized GET requests'
+    or diag Dumper \@requests;
 isa_ok $requests[0], 'Dancer::Request', 'Returned data';
 
 my @urls = sort { $a cmp $b } map { $_->uri } @requests;

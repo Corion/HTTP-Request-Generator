@@ -8,6 +8,7 @@ use List::MoreUtils 'zip';
 use URI;
 use URI::Escape;
 use Exporter 'import';
+use Carp 'croak';
 
 =head1 NAME
 
@@ -163,6 +164,8 @@ sub expand_pattern( $pattern ) {
         port       => _extract_enum( 'port', $port ),
         raw_params => 1,
     );
+
+    %res
 }
 
 sub _generate_requests_iter(%options) {
@@ -176,8 +179,6 @@ sub _generate_requests_iter(%options) {
     my $query_params = $options{ query_params } || {};
     my $body_params = $options{ body_params } || {};
     my $url_params = $options{ url_params } || {};
-    my $port_params = $options{ port } || [];
-    my $host_params = $options{ host } || [];
 
     $options{ "fixed_$_" } ||= {}
         for @keys;
@@ -190,7 +191,7 @@ sub _generate_requests_iter(%options) {
     $args{ $_ } ||= {}
         for qw(query_params body_params url_params);
     my @loops = _makeref @args{ @keys };
-    #use Data::Dumper; warn Dumper \@loops, \@keys;
+    #use Data::Dumper; warn Dumper \@loops, \@keys, \%options;
 
     # Turn all query_params into additional loops for each entry in keys %$query_params
     # Turn all body_params into additional loops over keys %$body_params
@@ -353,6 +354,9 @@ Limit the number of requests generated.
 =cut
 
 sub generate_requests(%options) {
+    croak "Option 'protocol' is now named 'scheme'."
+        if $options{ protocol };
+
     my $i = _generate_requests_iter(%options);
     if( wantarray ) {
         return fetch_all($i, $options{ limit });

@@ -3,7 +3,7 @@ use strict;
 use HTTP::Request::Generator qw(generate_requests);
 use Data::Dumper;
 
-use Test::More tests => 25;
+use Test::More tests => 26;
 
 my @requests = generate_requests();
 is 0+@requests, 1;
@@ -131,3 +131,14 @@ is $requests[1]->{scheme  }, 'https', "scheme   works";
 is 0+@requests, 2, 'We generate requests parametrized across hostnames';
 is $requests[0]->{host}, 'example.com', "Hostnames work";
 is $requests[1]->{host}, 'www.example.com', "Hostnames work";
+
+
+@requests = generate_requests(
+    method   => 'GET',
+    host     => ['example.com', 'www.example.com'],
+    scheme   => ['http', 'https'],
+    port     => [443,8443],
+    url      => '/',
+);
+is 0+@requests, 8, 'We generate parametrized GET requests'
+    or diag Dumper \@requests;
