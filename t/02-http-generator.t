@@ -56,8 +56,8 @@ is $requests[0]->{query_params}->{session}, 'my_session_id', 'Fixed parameters g
     or diag Dumper $requests[0];
 is_deeply $requests[0], {
     method => 'GET',
-    url => '/profiles/Corion/1',
-    protocol => 'http',
+    url    => '/profiles/Corion/1',
+    scheme => 'http',
     port => 80,
     host => '',
     headers => {},
@@ -115,12 +115,12 @@ is $requests[2]->{port}, 8443, "port numbers get expanded";
 
 @requests = generate_requests(
     method   => 'GET',
-    protocol => ['http', 'https'],
     url      => 'https://example.com/',
+    scheme   => ['http', 'https'],
 );
-is 0+@requests, 2, 'We generate requests parametrized across protocols';
-is $requests[0]->{protocol}, 'http', "Protocol works";
-is $requests[1]->{protocol}, 'https', "Protocol works";
+is 0+@requests, 2, 'We generate requests parametrized across scheme  s';
+is $requests[0]->{scheme  }, 'http', "scheme   works";
+is $requests[1]->{scheme  }, 'https', "scheme   works";
 
 @requests = generate_requests(
     host     => ['example.com', 'www.example.com'],

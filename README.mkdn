@@ -22,7 +22,7 @@ HTTP::Request::Generator - generate HTTP requests
     @requests = generate_requests(
         method => 'POST',
         host   => ['example.com','www.example.com'],
-        url    => '/profiles/:name',
+        path   => '/profiles/:name',
         url_params => {
             name => ['Corion','Co-Rion'],
         },
@@ -82,7 +82,7 @@ of choice.
     {
       method => 'GET',
       url => '/profiles/Mark',
-      protocol => 'http',
+      scheme => 'http',
       port => 80,
       headers => {},
       body_params => {},
