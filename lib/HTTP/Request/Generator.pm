@@ -83,7 +83,7 @@ our %defaults = (
     url          => ['/'],
     host         => [''],
     port         => [80],
-    protocol     => ['http'],
+    scheme       => ['http'],
 
     # How can we specify various values for the headers?
     headers      => [{}],
@@ -221,11 +221,11 @@ sub _generate_requests_iter(%options) {
 }
 
 sub _build_uri( $req ) {
-    my $uri = URI->new( $req->{url}, $req->{protocol} );
+    my $uri = URI->new( $req->{url}, $req->{scheme} );
     if( $req->{host}) {
         $uri->host( $req->{host});
     };
-    $uri->scheme( $req->{protocol});
+    $uri->scheme( $req->{scheme});
     $uri->port( $req->{port}) if( $req->{port} != $uri->default_port );
     $uri
 }
@@ -263,7 +263,7 @@ of choice.
   {
     method => 'GET',
     url => '/profiles/Mark',
-    protocol => 'http',
+    scheme => 'http',
     port => 80,
     headers => {},
     body_params => {},
@@ -451,7 +451,7 @@ sub as_plack($req) {
 
     my %env = %$req;
     $env{ 'psgi.version' } = '1.0';
-    $env{ 'psgi.url_scheme' } = delete $env{ protocol };
+    $env{ 'psgi.url_scheme' } = delete $env{ scheme };
     $env{ 'plack.request.query_parameters' } = [%{delete $env{ query_params }||{}} ];
     $env{ 'plack.request.body_parameters' } = [%{delete $env{ body_params }||{}} ];
     $env{ 'plack.request.headers' } = HTTP::Headers->new( %{ delete $req->{headers} });
