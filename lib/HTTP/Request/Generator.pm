@@ -139,6 +139,25 @@ sub _extract_enum( $name, $item ) {
     return \@res
 }
 
+sub _extract_enum_query( $query ) {
+    my $items = _extract_enum( 'query', $query );
+    my %parameters;
+    for my $q (@$items) {
+        my $u = URI->new('example.com', 'http');
+        $u->query($q);
+        my %f = $u->query_form;
+        for my $k (keys %f) {
+            $parameters{ $k }->{ $f{ $k }} = 1;
+        };
+    };
+
+    for my $v (values %parameters) {
+        $v = [ sort keys %$v ];
+    };
+
+    \%parameters
+}
+
 # Convert a curl-style https://{www.,}example.com/foo-[00..99].html to
 #                      https://:1example.com/foo-:2.html
 sub expand_pattern( $pattern ) {
@@ -146,7 +165,7 @@ sub expand_pattern( $pattern ) {
 
     # Split up the URL pattern into a scheme, host(pattern), port number and
     # path (pattern)
-    my( $scheme, $host, $port, $path ) = $pattern =~ m!^(?:([^:]+):)?/?/?(?:([^/:]+))(?::(\d+))?(.*)$!;
+    my( $scheme, $host, $port, $path, $query ) = $pattern =~ m!^(?:([^:]+):)?/?/?(?:([^/:]+))(?::(\d+))?([^?]*)(?:\?(.*))?$!;
 
     # Explicitly enumerate all ranges
     my $idx = 0;
@@ -157,12 +176,13 @@ sub expand_pattern( $pattern ) {
     $path =~ s!\{([^\}]*)\}!$ranges{$idx} = [split /,/, $1, -1]; ":".$idx++!ge;
 
     my %res = (
-        path      => $path,
-        url_params => \%ranges,
-        host       => _extract_enum( 'host', $host ),
-        scheme     => _extract_enum( 'scheme', $scheme ),
-        port       => _extract_enum( 'port', $port ),
-        raw_params => 1,
+        url_params   => \%ranges,
+        host         => _extract_enum( 'host', $host ),
+        scheme       => _extract_enum( 'scheme', $scheme ),
+        port         => _extract_enum( 'port', $port ),
+        path         => $path,
+        query_params => _extract_enum_query( $query ),
+        raw_params   => 1,
     );
 
     %res
@@ -259,6 +279,7 @@ sub _build_uri( $req ) {
         $uri->port( $req->{port}) if( $req->{port} and $req->{port} != $uri->default_port );
     };
     $uri->path( $req->{path});
+    $uri->query_form( $req->{query_params});
     $uri
 }
 
