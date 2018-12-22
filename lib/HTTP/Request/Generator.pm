@@ -279,7 +279,10 @@ sub _build_uri( $req ) {
         $uri->port( $req->{port}) if( $req->{port} and $req->{port} != $uri->default_port );
     };
     $uri->path( $req->{path});
-    $uri->query_form( $req->{query_params});
+    # We want predictable URIs, so we sort the keys here instead of
+    # just passing the hash reference
+    $uri->query_form( map { $_ => $req->{query_params}->{$_} } sort keys %{ $req->{query_params} });
+    #$uri->query_form( $req->{query_params});
     $uri
 }
 
