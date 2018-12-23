@@ -125,17 +125,32 @@ sub _extract_enum( $name, $item ) {
 
     if( $item ) {
         # Expand all ranges into the enumerated lists
-        $item =~ s!\[([^.]+)\.\.([^.]+)\]!"{" . join(",", $1..$2 )."}"!ge;
+        $item =~ s!\[([^.\]]+?)\.\.([^.\]]+?)\]!"{" . join(",", $1..$2 )."}"!ge;
 
         # Explode all enumerated items into their list
-        if( $item =~ /^([^{]*)\{([^}]+)\}([^{]*)$/ ) {
-            my($pre, $post) = ($1,$3);
-            @res = map { "$pre$_$post" } split /,/, $2, -1;
+        # We should punt this into a(nother) iterator, maybe?!
+        if( $item =~ /\{.*\}/ ) {
+            my $changed = 1;
+            @res = $item;
+            while ($changed) {
+                undef $changed;
+                @res = map {
+                    my $i = $_;
+                    my @r;
+                    if( $i =~ /^([^{]*)\{([^}]+)\}(.*)/ ) {
+                        my($pre, $m, $post) = ($1,$2,$3);
+                        $changed = 1;
+                        @r = map { "$pre$_$post" } split /,/, $m, -1;
+                    } else {
+                        @r = $i
+                    };
+                    @r
+                } @res;
+            }
         } else {
             @res = $item;
         };
     };
-
     return \@res
 }
 
@@ -170,8 +185,7 @@ sub expand_pattern( $pattern ) {
     # Explicitly enumerate all ranges
     my $idx = 0;
 
-    $path =~ s!\[([^.]+)\.\.([^.]+)\]!$ranges{$idx} = [$1..$2]; ":".$idx++!ge;
-
+    $path =~ s!\[([^.\]]+?)\.\.([^.\[]+?)\]!$ranges{$idx} = [$1..$2]; ":".$idx++!ge;
     # Move all explicitly enumerated parts into lists:
     $path =~ s!\{([^\}]*)\}!$ranges{$idx} = [split /,/, $1, -1]; ":".$idx++!ge;
 
@@ -189,7 +203,7 @@ sub expand_pattern( $pattern ) {
 }
 
 sub _generate_requests_iter(%options) {
-    my $wrapper = delete $options{ wrap } || sub {@_};
+    my $wrapper = delete $options{ wrap } || sub { wantarray ? @_ : $_[0]};
     my @keys = sort keys %defaults;
 
     if( my $pattern = delete $options{ pattern }) {
