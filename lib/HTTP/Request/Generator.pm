@@ -185,15 +185,32 @@ sub expand_pattern( $pattern ) {
     # Explicitly enumerate all ranges
     my $idx = 0;
 
-    $path =~ s!\[([^.\]]+?)\.\.([^.\[]+?)\]!$ranges{$idx} = [$1..$2]; ":".$idx++!ge;
-    # Move all explicitly enumerated parts into lists:
-    $path =~ s!\{([^\}]*)\}!$ranges{$idx} = [split /,/, $1, -1]; ":".$idx++!ge;
+    if( $scheme ) {
+        $scheme =~ s!\[([^.\]]+?)\.\.([^.\[]+?)\]!$ranges{$idx} = [$1..$2]; ":".$idx++!ge;
+        $scheme =~ s!\{([^\}]*)\}!$ranges{$idx} = [split /,/, $1, -1]; ":".$idx++!ge;
+    };
+
+    if( $host ) {
+        $host =~ s!\[([^.\]]+?)\.\.([^.\[]+?)\]!$ranges{$idx} = [$1..$2]; ":".$idx++!ge;
+        $host =~ s!\{([^\}]*)\}!$ranges{$idx} = [split /,/, $1, -1]; ":".$idx++!ge;
+    };
+
+    if( $port ) {
+        $port =~ s!\[([^.\]]+?)\.\.([^.\[]+?)\]!$ranges{$idx} = [$1..$2]; ":".$idx++!ge;
+        $port =~ s!\{([^\}]*)\}!$ranges{$idx} = [split /,/, $1, -1]; ":".$idx++!ge;
+    };
+
+    if( $path ) {
+        $path =~ s!\[([^.\]]+?)\.\.([^.\[]+?)\]!$ranges{$idx} = [$1..$2]; ":".$idx++!ge;
+        # Move all explicitly enumerated parts into lists:
+        $path =~ s!\{([^\}]*)\}!$ranges{$idx} = [split /,/, $1, -1]; ":".$idx++!ge;
+    };
 
     my %res = (
         url_params   => \%ranges,
-        host         => _extract_enum( 'host', $host ),
-        scheme       => _extract_enum( 'scheme', $scheme ),
-        port         => _extract_enum( 'port', $port ),
+        host         => $host,
+        scheme       => $scheme,
+        port         => $port,
         path         => $path,
         query_params => _extract_enum_query( $query ),
         raw_params   => 1,
@@ -273,7 +290,9 @@ sub _generate_requests_iter(%options) {
             my %v;
             @v{ @url_params } = splice @v, 0, 0+@url_params;
             #use Data::Dumper; warn Dumper \%values;
-            $values{ path } = fill_url($values{ path }, \%v, $options{ raw_params });
+            for my $key (qw(scheme host port path )) {
+                $values{ $key } = fill_url($values{ $key }, \%v, $options{ raw_params });
+            };
         };
 
         $values{ url } = _build_uri( \%values );
