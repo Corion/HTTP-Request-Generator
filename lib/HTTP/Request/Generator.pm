@@ -137,7 +137,7 @@ sub _extract_enum( $name, $item ) {
                 @res = map {
                     my $i = $_;
                     my @r;
-                    if( $i =~ /^([^{]*)\{([^}]+)\}(.*)/ ) {
+                    if( $i =~ /^([^{]*)\{([^}]+)\}([^{]*)/ ) {
                         my($pre, $m, $post) = ($1,$2,$3);
                         $changed = 1;
                         @r = map { "$pre$_$post" } split /,/, $m, -1;
