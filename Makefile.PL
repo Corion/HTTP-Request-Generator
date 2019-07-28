@@ -47,6 +47,7 @@ my %module = (
     PREREQ_PM => {
         'Exporter'           => 5,
         'Carp'               => 0,
+        'feature'            => 0,
         'Filter::signatures' => 0,
         'Algorithm::Loops'   => 0,
         'List::MoreUtils'    => 0,
