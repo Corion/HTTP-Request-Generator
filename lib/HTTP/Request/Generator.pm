@@ -60,7 +60,9 @@ HTTP::Request::Generator - generate HTTP requests
 =cut
 
 our $VERSION = '0.07';
-our @EXPORT_OK = qw( generate_requests as_dancer as_plack as_http_request);
+our @EXPORT_OK = qw( generate_requests as_dancer as_plack as_http_request
+    expand_curl_pattern
+);
 
 sub unwrap($item,$default) {
     defined $item
@@ -173,9 +175,18 @@ sub _extract_enum_query( $query ) {
     \%parameters
 }
 
-# Convert a curl-style https://{www.,}example.com/foo-[00..99].html to
-#                      https://:1example.com/foo-:2.html
-sub expand_pattern( $pattern ) {
+
+=head2 C<< expand_curl_pattern >>
+
+    my %res = expand_curl_pattern( 'https://' );
+    #
+
+Expands a curl-style pattern to a pattern using positional placeholders.
+See the C<curl> documentation on the patterns.
+
+=cut
+
+sub expand_curl_pattern( $pattern ) {
     my %ranges;
 
     # Split up the URL pattern into a scheme, host(pattern), port number and
@@ -224,7 +235,7 @@ sub _generate_requests_iter(%options) {
     my @keys = sort keys %defaults;
 
     if( my $pattern = delete $options{ pattern }) {
-        %options = (%options, expand_pattern( $pattern ));
+        %options = (%options, expand_curl_pattern( $pattern ));
     };
 
     my $query_params = $options{ query_params } || {};
