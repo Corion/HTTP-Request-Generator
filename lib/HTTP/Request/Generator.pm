@@ -354,7 +354,23 @@ two requests:
       url => '/profiles/John',
 
 C<generate_requests> returns an iterator in scalar context. In list context, it
-returns the complete list of requests.
+returns the complete list of requests:
+
+  my @requests = generate_requests(
+      url => '/profiles/:name',
+      url_params => ['Mark','John'],
+      wrap => sub {
+          my( $req ) = @_;
+          # Fix up some values
+          $req->{headers}->{'Content-Length'} = 666;
+      },
+  );
+  for my $r (@requests) {
+      send_request( $r );
+  };
+
+Note that returning a list instead of the iterator will use up quite some memory
+quickly, as the list will be the cartesian product of the input parameters.
 
 There are helper functions
 that will turn that data into a data structure suitable for your HTTP framework
@@ -380,6 +396,8 @@ lists will be expanded in memory.
 =over 4
 
 =item B<pattern>
+
+    pattern => 'https://example.{com,org,net}/page_[00..99].html',
 
 Generate URLs from this pattern instead of C<query_params>, C<url_params>
 and C<url>.
@@ -628,7 +646,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2017-2018 by Max Maischein C<corion@cpan.org>.
+Copyright 2017-2019 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 
