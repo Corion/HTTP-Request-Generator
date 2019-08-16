@@ -487,6 +487,16 @@ sub as_http_request($req) {
 
 Converts the request data to a L<Dancer::Request> object.
 
+During the creation of Dancer::Request objects, C<< %ENV >> will be empty except
+for C<< $ENV{TMP} >> and C<< $ENV{TEMP} >>.
+
+
+This function needs and dynamically loads the following modules:
+
+L<Dancer::Request>
+
+L<HTTP::Request>
+
 =cut
 
 sub as_dancer($req) {
@@ -512,7 +522,10 @@ sub as_dancer($req) {
     my $uri = _build_uri( $req );
 
     # Store metadata / generate "signature" for later inspection/isolation?
+    my %old_ENV = %ENV;
     local %ENV; # wipe out non-overridable default variables of Dancer::Request
+    my @keep = (qw(TMP TEMP));
+    @ENV{ @keep } = @old_ENV{ @keep };
     my $res = Dancer::Request->new_for_request(
         $req->{method} =>  $uri->path,
         $req->{query_params},
@@ -544,6 +557,17 @@ sub as_dancer($req) {
 
 Converts the request data to a L<Plack::Request> object.
 
+During the creation of Plack::Request objects, C<< %ENV >> will be empty except
+for C<< $ENV{TMP} >> and C<< $ENV{TEMP} >>.
+
+This function needs and dynamically loads the following modules:
+
+L<Plack::Request>
+
+L<HTTP::Headers>
+
+L<Hash::MultiValue>
+
 =cut
 
 sub as_plack($req) {
@@ -569,7 +593,10 @@ sub as_plack($req) {
     $env{ CONTENT_TYPE } = undef;
 
     # Store metadata / generate "signature" for later inspection/isolation?
+    my %old_ENV = %ENV;
     local %ENV; # wipe out non-overridable default variables of Dancer::Request
+    my @keep = (qw(TMP TEMP));
+    @ENV{ @keep } = @old_ENV{ @keep };
     my $res = Plack::Request->new(\%env);
     $res
 }
