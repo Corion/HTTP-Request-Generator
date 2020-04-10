@@ -106,9 +106,9 @@ our %defaults = (
 sub fill_url( $url, $values, $raw=undef ) {
     if( $values ) {
         if( $raw ) {
-            $url =~ s!:(\w+)!exists $values->{$1} ? $values->{$1} : $1!ge;
+            $url =~ s!:(\w+)!exists $values->{$1} ? $values->{$1} : ":$1"!ge;
         } else {
-            $url =~ s!:(\w+)!exists $values->{$1} ? uri_escape($values->{$1}) : $1!ge;
+            $url =~ s!:(\w+)!exists $values->{$1} ? uri_escape($values->{$1}) : ":$1"!ge;
         };
     };
     $url
