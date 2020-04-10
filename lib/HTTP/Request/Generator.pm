@@ -191,7 +191,26 @@ sub expand_curl_pattern( $pattern ) {
 
     # Split up the URL pattern into a scheme, host(pattern), port number and
     # path (pattern)
-    my( $scheme, $host, $port, $path, $query ) = $pattern =~ m!^(?:([^:]+):)?/?/?(?:([^/:]+))(?::(\d+))?([^?]*)(?:\?(.*))?$!;
+    #use Regexp::Debugger;
+    #use re 'debug';
+    my( $scheme, $host, $port, $path, $query )
+        = $pattern =~ m!^(?:([^:]+):)? # scheme
+                         /?/?          # optional? slashes
+                         (             # hostname
+                              \[(?:[:\da-fA-F]+)\]             # ipv6
+                             |[^/:\[]+
+                                  (?:\[[^/\]]+\][^/:\[]*)*
+                                  (?=[:/]|$)                     # plain, or expansion
+                             |\[[^:\]]+\][^/:]*                # expansion
+                         )
+                         (?::(\d+))?   # optional port
+                         ([^?]*)       # path
+                         (?:\?(.*))?   # optional query part
+                         $!x;
+    #my( $scheme, $host, $port, $path, $query )
+    #    = $pattern =~ m!^(?:([^:]+):)?/?/?(\[(?:[:\da-fA-F]+)\]|[^/:\[]+(?:\[[^/\]]+\][^/:\[]*)*(?=[:/]|$)|\[[^:\]]+\][^/:]*)(?::(\d+))?([^?]*)(?:\?(.*))?$!;
+
+    #no Regexp::Debugger;
 
     # Explicitly enumerate all ranges
     my $idx = 0;
@@ -226,7 +245,6 @@ sub expand_curl_pattern( $pattern ) {
         query_params => _extract_enum_query( $query ),
         raw_params   => 1,
     );
-
     %res
 }
 
