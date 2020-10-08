@@ -357,6 +357,7 @@ sub _build_uri( $req ) {
           my( $req ) = @_;
           # Fix up some values
           $req->{headers}->{'Content-Length'} = 666;
+          return $req;
       },
   );
   while( my $r = $g->()) {
@@ -381,6 +382,7 @@ returns the complete list of requests:
           my( $req ) = @_;
           # Fix up some values
           $req->{headers}->{'Content-Length'} = 666;
+          return $req;
       },
   );
   for my $r (@requests) {
