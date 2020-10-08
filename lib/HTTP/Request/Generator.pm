@@ -59,7 +59,7 @@ HTTP::Request::Generator - generate HTTP requests
 
 =cut
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 our @EXPORT_OK = qw( generate_requests as_dancer as_plack as_http_request
     expand_curl_pattern
 );
