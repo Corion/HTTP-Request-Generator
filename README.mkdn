@@ -1,5 +1,4 @@
 
-[![Travis Build Status](https://travis-ci.org/Corion/HTTP-Request-Generator.svg?branch=master)](https://travis-ci.org/Corion/HTTP-Request-Generator)
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/HTTP-Request-Generator?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/HTTP-Request-Generator)
 
 # NAME
